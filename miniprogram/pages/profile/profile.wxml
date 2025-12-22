@@ -131,7 +131,7 @@
         <view class="history-time">{{formatDateTime(item.createdAt)}}</view>
         <view class="history-result">
           <text class="result-text">{{item.success ? '成功' : '失败'}}</text>
-          <text class="confidence" wx:if="{{item.success}}">{{(item.confidence * 100).toFixed(1)}}%</text>
+          <text class="confidence" wx:if="{{item.success}}">{{item.confidence * 100}}%</text>
         </view>
       </view>
     </view>

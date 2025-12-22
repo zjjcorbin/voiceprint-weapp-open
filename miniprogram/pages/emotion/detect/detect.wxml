@@ -125,7 +125,7 @@
                 style="width: {{prob.probability * 100}}%"
               ></view>
             </view>
-            <view class="bar-value">{{(prob.probability * 100).toFixed(1)}}%</view>
+            <view class="bar-value">{{prob.probability * 100}}%</view>
           </view>
         </view>
       </view>

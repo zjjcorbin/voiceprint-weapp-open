@@ -70,7 +70,7 @@
         <view class="result-header">
           <text class="result-title">{{verificationResult.success ? '验证成功' : '验证失败'}}</text>
           <text class="result-confidence" wx:if="{{verificationResult.success}}">
-            置信度：{{(verificationResult.confidence * 100).toFixed(1)}}%
+            置信度：{{verificationResult.confidence * 100}}%
           </text>
         </view>
         
@@ -107,7 +107,7 @@
         <view class="history-result">
           <text class="result-text">{{item.success ? '成功' : '失败'}}</text>
           <text class="confidence-text" wx:if="{{item.success}}">
-            {{(item.confidence * 100).toFixed(1)}}%
+            {{item.confidence * 100}}%
           </text>
         </view>
       </view>
