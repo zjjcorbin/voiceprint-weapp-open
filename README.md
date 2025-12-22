@@ -143,7 +143,7 @@ voiceprint-weapp-open/
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/your-org/voiceprint-weapp-open.git
+git clone https://github.com/zjjcorbin/voiceprint-weapp-open.git
 cd voiceprint-weapp-open
 
 # 2. 初始化环境
