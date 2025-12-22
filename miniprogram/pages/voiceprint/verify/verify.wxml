@@ -1,0 +1,140 @@
+<view class="container">
+  <!-- 顶部区域 -->
+  <view class="header">
+    <text class="title">声纹验证</text>
+    <text class="subtitle">请说出任意内容进行身份验证</text>
+  </view>
+
+  <!-- 主要验证区域 -->
+  <view class="verify-section">
+    <!-- 验证状态显示 -->
+    <view class="status-display">
+      <view class="status-icon {{verificationStatus}}">
+        <text class="icon-text">{{getStatusIcon()}}</text>
+      </view>
+      <text class="status-title">{{getStatusTitle()}}</text>
+      <text class="status-desc">{{getStatusDesc()}}</text>
+    </view>
+
+    <!-- 录音控制区域 -->
+    <view class="recording-area">
+      <!-- 录音按钮 -->
+      <view class="record-btn-container">
+        <button 
+          class="record-btn {{isRecording ? 'recording' : ''}}" 
+          bindtouchstart="startRecording" 
+          bindtouchend="stopRecording"
+          disabled="{{processing}}"
+        >
+          <view class="record-btn-inner">
+            <text class="record-icon">{{isRecording ? '⏸' : '🎤'}}</text>
+          </view>
+        </button>
+      </view>
+
+      <!-- 录音状态 -->
+      <view class="recording-status">
+        <text class="status-text" wx:if="{{!isRecording && !hasRecording}}">
+          按住下方按钮开始录音
+        </text>
+        <text class="status-text recording" wx:if="{{isRecording}}">
+          正在录音...
+        </text>
+        <text class="status-text processing" wx:if="{{processing}}">
+          正在识别...
+        </text>
+      </view>
+
+      <!-- 录音时长 -->
+      <view class="recording-duration" wx:if="{{isRecording}}">
+        <text class="duration">{{formatTime(recordingDuration)}}</text>
+      </view>
+
+      <!-- 音频波形 -->
+      <view class="waveform" wx:if="{{isRecording}}">
+        <view class="wave-bars">
+          <view class="wave-bar" wx:for="{{waveformData}}" wx:key="index" 
+                style="height: {{item}}rpx; animation-delay: {{index * 0.05}}s;"></view>
+        </view>
+      </view>
+
+      <!-- 提示文本 -->
+      <view class="recording-tips">
+        <text class="tip-text">{{getRecordingTip()}}</text>
+      </view>
+    </view>
+
+    <!-- 验证结果 -->
+    <view class="result-section" wx:if="{{verificationResult}}">
+      <view class="result-card {{verificationResult.success ? 'success' : 'fail'}}">
+        <view class="result-header">
+          <text class="result-title">{{verificationResult.success ? '验证成功' : '验证失败'}}</text>
+          <text class="result-confidence" wx:if="{{verificationResult.success}}">
+            置信度：{{(verificationResult.confidence * 100).toFixed(1)}}%
+          </text>
+        </view>
+        
+        <view class="result-details" wx:if="{{verificationResult.success}}">
+          <view class="detail-item">
+            <text class="detail-label">识别用户：</text>
+            <text class="detail-value">{{verificationResult.userName}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">验证时间：</text>
+            <text class="detail-value">{{verificationResult.verifyTime}}</text>
+          </view>
+        </view>
+
+        <view class="result-actions">
+          <button class="retry-btn" bindtap="retry">重新验证</button>
+          <button class="close-btn" bindtap="closeResult">关闭</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="history-section" wx:if="{{verificationHistory.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">最近验证记录</text>
+      <text class="more-btn" bindtap="viewAllHistory">查看全部</text>
+    </view>
+    
+    <view class="history-list">
+      <view class="history-item {{item.success ? 'success' : 'fail'}}" 
+            wx:for="{{verificationHistory}}" wx:key="id">
+        <view class="history-time">{{item.time}}</view>
+        <view class="history-result">
+          <text class="result-text">{{item.success ? '成功' : '失败'}}</text>
+          <text class="confidence-text" wx:if="{{item.success}}">
+            {{(item.confidence * 100).toFixed(1)}}%
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="quick-actions">
+    <button class="action-btn register" bindtap="goToRegister" wx:if="{{!isRegistered}}">
+      <text>注册声纹</text>
+    </button>
+    <button class="action-btn meeting" bindtap="goToMeeting">
+      <text>会议管理</text>
+    </button>
+  </view>
+</view>
+
+<!-- 录音遮罩 -->
+<view class="recording-overlay" wx:if="{{isRecording}}">
+  <view class="overlay-content">
+    <view class="recording-visual">
+      <view class="pulse-ring"></view>
+      <view class="pulse-ring delay-1"></view>
+      <view class="pulse-ring delay-2"></view>
+      <view class="recording-icon">🎤</view>
+    </view>
+    <text class="overlay-text">正在录音...</text>
+    <text class="overlay-tip">松开结束录音</text>
+  </view>
+</view>

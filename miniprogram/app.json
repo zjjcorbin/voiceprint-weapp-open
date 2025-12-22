@@ -1,0 +1,72 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/voiceprint/register/register",
+    "pages/voiceprint/verify/verify",
+    "pages/emotion/detect/detect",
+    "pages/emotion/history/history",
+    "pages/emotion/detail/detail",
+    "pages/meeting/create/create",
+    "pages/meeting/detail/detail",
+    "pages/meeting/list/list",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#007AFF",
+    "navigationBarTitleText": "声纹识别系统",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/voiceprint/register/register",
+        "text": "声纹",
+        "iconPath": "images/voice.png",
+        "selectedIconPath": "images/voice-active.png"
+      },
+      {
+        "pagePath": "pages/emotion/detect/detect",
+        "text": "情绪",
+        "iconPath": "images/emotion.png",
+        "selectedIconPath": "images/emotion-active.png"
+      },
+      {
+        "pagePath": "pages/meeting/list/list",
+        "text": "会议",
+        "iconPath": "images/meeting.png",
+        "selectedIconPath": "images/meeting-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.record": {
+      "desc": "需要录音权限进行声纹识别和情绪分析"
+    }
+  },
+  "requiredBackgroundModes": ["audio"],
+  "networkTimeout": {
+    "request": 10000,
+    "uploadFile": 30000,
+    "downloadFile": 10000
+  },
+  "debug": false
+}

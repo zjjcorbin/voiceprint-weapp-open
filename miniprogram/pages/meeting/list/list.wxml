@@ -1,0 +1,124 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-container">
+      <input class="search-input" 
+             placeholder="搜索会议标题或描述" 
+             value="{{searchKeyword}}"
+             bindinput="onSearchInput"
+             bindconfirm="onSearch" />
+      <view class="search-actions" wx:if="{{searchKeyword}}">
+        <text class="clear-btn" bindtap="onClearSearch">✕</text>
+      </view>
+    </view>
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <!-- 标签栏 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === index ? 'active' : ''}}" 
+          wx:for="{{tabs}}" wx:key="index"
+          data-index="{{index}}"
+          bindtap="switchTab">
+      <text class="tab-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 会议列表 -->
+  <view class="meeting-list">
+    <!-- 加载状态 -->
+    <view class="loading-container" wx:if="{{loading && meetings.length === 0}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-container" wx:if="{{!loading && meetings.length === 0}}">
+      <view class="empty-icon">📅</view>
+      <text class="empty-text">暂无会议记录</text>
+      <button class="create-btn" bindtap="createMeeting">创建会议</button>
+    </view>
+
+    <!-- 会议项 -->
+    <view class="meeting-item" wx:for="{{meetings}}" wx:key="id">
+      <view class="meeting-header" bindtap="viewMeeting" data-id="{{item.id}}">
+        <view class="meeting-info">
+          <text class="meeting-title">{{item.title}}</text>
+          <text class="meeting-desc" wx:if="{{item.description}}">{{item.description}}</text>
+        </view>
+        <view class="meeting-status {{getStatusClass(item.status)}}">
+          <text class="status-text">{{getStatusText(item.status)}}</text>
+        </view>
+      </view>
+
+      <view class="meeting-details" bindtap="viewMeeting" data-id="{{item.id}}">
+        <view class="detail-item">
+          <text class="detail-label">开始时间：</text>
+          <text class="detail-value">{{item.startTime}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">结束时间：</text>
+          <text class="detail-value">{{item.endTime}}</text>
+        </view>
+        <view class="detail-item" wx:if="{{item.participantCount > 0}}">
+          <text class="detail-label">参与人数：</text>
+          <text class="detail-value">{{item.participantCount}}人</text>
+        </view>
+        <view class="detail-item" wx:if="{{item.recordingCount > 0}}">
+          <text class="detail-label">录音数量：</text>
+          <text class="detail-value">{{item.recordingCount}}条</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="meeting-actions">
+        <button class="action-btn primary" 
+                wx:if="{{item.status === 'scheduled'}}"
+                bindtap="startRecording" 
+                data-id="{{item.id}}">
+          <text>开始录音</text>
+        </button>
+        
+        <button class="action-btn warning" 
+                wx:if="{{item.status === 'ongoing'}}"
+                bindtap="stopRecording" 
+                data-id="{{item.id}}">
+          <text>停止录音</text>
+        </button>
+        
+        <button class="action-btn default" 
+                bindtap="viewMeeting" 
+                data-id="{{item.id}}">
+          <text>查看详情</text>
+        </button>
+        
+        <button class="action-btn danger" 
+                wx:if="{{item.status !== 'ongoing'}}"
+                bindtap="deleteMeeting" 
+                data-id="{{item.id}}">
+          <text>删除</text>
+        </button>
+      </view>
+
+      <!-- 创建时间 -->
+      <view class="meeting-footer">
+        <text class="created-time">创建时间：{{item.createdAt}}</text>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore && meetings.length > 0}}">
+      <text class="load-more-text" wx:if="{{!loading}}">上拉加载更多</text>
+      <text class="load-more-text" wx:if="{{loading}}">加载中...</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more" wx:if="{{!hasMore && meetings.length > 0}}">
+      <text class="no-more-text">没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 悬浮创建按钮 -->
+  <view class="fab" bindtap="createMeeting">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

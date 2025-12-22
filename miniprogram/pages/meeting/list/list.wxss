@@ -1,0 +1,350 @@
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 120rpx;
+}
+
+/* 搜索栏 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background: white;
+  border-bottom: 1rpx solid #e8e8e8;
+}
+
+.search-input-container {
+  flex: 1;
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 40rpx;
+  padding: 0 30rpx;
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  height: 72rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+}
+
+.clear-btn {
+  width: 32rpx;
+  height: 32rpx;
+  background: #999;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+}
+
+.search-btn {
+  width: 120rpx;
+  height: 72rpx;
+  background: #007AFF;
+  color: white;
+  border: none;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 标签栏 */
+.tab-bar {
+  display: flex;
+  background: white;
+  border-bottom: 1rpx solid #e8e8e8;
+  padding: 0 30rpx;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx 0;
+  position: relative;
+}
+
+.tab-text {
+  font-size: 28rpx;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.tab-item.active .tab-text {
+  color: #007AFF;
+  font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: #007AFF;
+  border-radius: 2rpx;
+}
+
+/* 会议列表 */
+.meeting-list {
+  padding: 20rpx 30rpx;
+}
+
+/* 加载状态 */
+.loading-container {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-container {
+  text-align: center;
+  padding: 120rpx 0;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  display: block;
+  font-size: 32rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.create-btn {
+  width: 240rpx;
+  height: 80rpx;
+  background: #007AFF;
+  color: white;
+  border: none;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+/* 会议项 */
+.meeting-item {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.meeting-item:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 会议头部 */
+.meeting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.meeting-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.meeting-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+  line-height: 1.4;
+}
+
+.meeting-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.meeting-status {
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  flex-shrink: 0;
+}
+
+.meeting-status.scheduled {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.meeting-status.ongoing {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.meeting-status.completed {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+.meeting-status.cancelled {
+  background: #fff2f0;
+  color: #ff4d4f;
+}
+
+/* 会议详情 */
+.meeting-details {
+  margin-bottom: 20rpx;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #999;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333;
+  flex: 1;
+}
+
+/* 操作按钮 */
+.meeting-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  height: 64rpx;
+  border-radius: 32rpx;
+  border: none;
+  font-size: 26rpx;
+  padding: 0 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.action-btn.primary {
+  background: #007AFF;
+  color: white;
+}
+
+.action-btn.warning {
+  background: #ff9500;
+  color: white;
+}
+
+.action-btn.default {
+  background: #f8f9fa;
+  color: #333;
+  border: 1rpx solid #dee2e6;
+}
+
+.action-btn.danger {
+  background: #ff3b30;
+  color: white;
+}
+
+/* 会议底部 */
+.meeting-footer {
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 16rpx;
+}
+
+.created-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 加载更多 */
+.load-more {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.load-more-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 没有更多 */
+.no-more {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.no-more-text {
+  font-size: 28rpx;
+  color: #ccc;
+}
+
+/* 悬浮按钮 */
+.fab {
+  position: fixed;
+  bottom: 120rpx;
+  right: 30rpx;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007AFF 0%, #00C6FF 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.fab-icon {
+  font-size: 48rpx;
+  font-weight: bold;
+}

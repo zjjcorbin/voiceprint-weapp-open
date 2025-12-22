@@ -1,0 +1,147 @@
+<view class="container">
+  <!-- 顶部欢迎信息 -->
+  <view class="header">
+    <view class="welcome" wx:if="{{userInfo}}">
+      <text class="greeting">你好，{{userInfo.name}}</text>
+      <text class="subtitle">欢迎使用声纹识别系统</text>
+    </view>
+    <view class="login-prompt" wx:else>
+      <text class="greeting">请先登录</text>
+      <text class="subtitle">使用完整功能</text>
+    </view>
+  </view>
+
+  <!-- 主要功能卡片 -->
+  <view class="function-cards">
+    <!-- 声纹注册 -->
+    <view class="card" bindtap="navigateToVoiceprint">
+      <view class="card-icon voiceprint-icon">
+        <image src="/images/voiceprint-register.png" mode="aspectFit"></image>
+      </view>
+      <view class="card-content">
+        <text class="card-title">声纹注册</text>
+        <text class="card-desc">录制您的声音样本</text>
+      </view>
+      <view class="card-arrow">
+        <text class="arrow">></text>
+      </view>
+    </view>
+
+    <!-- 声纹验证 -->
+    <view class="card" bindtap="navigateToVerify">
+      <view class="card-icon verify-icon">
+        <image src="/images/voiceprint-verify.png" mode="aspectFit"></image>
+      </view>
+      <view class="card-content">
+        <text class="card-title">声纹验证</text>
+        <text class="card-desc">验证您的身份</text>
+      </view>
+      <view class="card-arrow">
+        <text class="arrow">></text>
+      </view>
+    </view>
+
+    <!-- 会议管理 -->
+    <view class="card" bindtap="navigateToMeeting">
+      <view class="card-icon meeting-icon">
+        <image src="/images/meeting-manage.png" mode="aspectFit"></image>
+      </view>
+      <view class="card-content">
+        <text class="card-title">会议管理</text>
+        <text class="card-desc">创建和管理会议</text>
+      </view>
+      <view class="card-arrow">
+        <text class="arrow">></text>
+      </view>
+    </view>
+
+    <!-- 快速验证 -->
+    <view class="card quick-verify" bindtap="quickVerify">
+      <view class="card-icon quick-icon">
+        <text class="quick-text">快速</text>
+      </view>
+      <view class="card-content">
+        <text class="card-title">快速验证</text>
+        <text class="card-desc">点击立即验证身份</text>
+      </view>
+      <view class="card-arrow">
+        <text class="arrow">></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 系统状态 -->
+  <view class="status-section">
+    <view class="status-title">
+      <text>系统状态</text>
+    </view>
+    <view class="status-cards">
+      <view class="status-card">
+        <text class="status-label">注册状态</text>
+        <text class="status-value {{voiceprintStatus.registered ? 'success' : 'pending'}}">
+          {{voiceprintStatus.registered ? '已注册' : '未注册'}}
+        </text>
+      </view>
+      <view class="status-card">
+        <text class="status-label">样本数量</text>
+        <text class="status-value">{{voiceprintStatus.sampleCount}}</text>
+      </view>
+      <view class="status-card">
+        <text class="status-label">识别准确率</text>
+        <text class="status-value">{{voiceprintStatus.accuracy}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近活动 -->
+  <view class="recent-section" wx:if="{{recentActivities.length > 0}}">
+    <view class="section-title">
+      <text>最近活动</text>
+      <text class="more" bindtap="viewMore">更多 ></text>
+    </view>
+    <view class="activity-list">
+      <view class="activity-item" wx:for="{{recentActivities}}" wx:key="id">
+        <view class="activity-icon {{item.type}}">
+          <text class="icon-text">{{item.type === 'verify' ? '验' : '会'}}</text>
+        </view>
+        <view class="activity-content">
+          <text class="activity-title">{{item.title}}</text>
+          <text class="activity-time">{{item.time}}</text>
+        </view>
+        <view class="activity-result {{item.success ? 'success' : 'fail'}}">
+          <text>{{item.success ? '成功' : '失败'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷操作按钮 -->
+  <view class="quick-actions" wx:if="{{userInfo}}">
+    <button class="action-btn primary" bindtouchstart="startRecording" bindtouchend="stopRecording">
+      <view class="btn-content">
+        <text class="btn-icon">🎤</text>
+        <text class="btn-text">{{isRecording ? '录音中...' : '按住录音'}}</text>
+      </view>
+    </button>
+  </view>
+
+  <!-- 登录按钮 -->
+  <view class="login-section" wx:if="{{!userInfo}}">
+    <button class="login-btn" bindtap="wxLogin">
+      <text>微信登录</text>
+    </button>
+  </view>
+
+  <!-- 录音状态提示 -->
+  <view class="recording-modal" wx:if="{{isRecording}}">
+    <view class="modal-content">
+      <view class="recording-animation">
+        <view class="wave"></view>
+        <view class="wave"></view>
+        <view class="wave"></view>
+      </view>
+      <text class="recording-text">正在录音...</text>
+      <text class="recording-tip">松开结束录音</text>
+    </view>
+  </view>
+</view>

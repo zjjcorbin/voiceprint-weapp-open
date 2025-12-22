@@ -1,0 +1,568 @@
+/* pages/emotion/detect/detect.wxss */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 顶部导航栏 */
+.header {
+  padding: 40rpx 30rpx 20rpx;
+}
+
+.nav-bar {
+  text-align: center;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 10rpx;
+}
+
+.nav-subtitle {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 主要内容区域 */
+.main-content {
+  padding: 0 30rpx 60rpx;
+}
+
+/* 情绪识别卡片 */
+.emotion-card {
+  background: white;
+  border-radius: 30rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10rpx;
+}
+
+.card-subtitle {
+  font-size: 26rpx;
+  color: #7f8c8d;
+}
+
+/* 录音区域 */
+.record-section {
+  margin-bottom: 40rpx;
+}
+
+.record-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.record-button {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 8rpx 25rpx rgba(255, 107, 107, 0.3);
+}
+
+.record-button.recording {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.record-icon {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.record-text {
+  font-size: 28rpx;
+  color: #7f8c8d;
+}
+
+.record-status {
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  padding: 20rpx;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
+}
+
+.status-label {
+  font-size: 26rpx;
+  color: #7f8c8d;
+}
+
+.status-value {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.status-value.success {
+  color: #27ae60;
+}
+
+/* 音频播放器 */
+.audio-player {
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+}
+
+.play-button {
+  width: 60rpx;
+  height: 60rpx;
+  margin-right: 20rpx;
+}
+
+.audio-info {
+  flex: 1;
+}
+
+.audio-duration {
+  font-size: 26rpx;
+  color: #2c3e50;
+}
+
+/* 检测按钮 */
+.detect-section {
+  margin-bottom: 30rpx;
+}
+
+.detect-button {
+  width: 100%;
+  height: 80rpx;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border-radius: 15rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  border: none;
+}
+
+/* 检测中状态 */
+.detecting-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.loading-animation {
+  margin-bottom: 30rpx;
+}
+
+.loading-circle {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.loading-subtext {
+  font-size: 24rpx;
+  color: #7f8c8d;
+}
+
+/* 结果区域 */
+.result-section {
+  background: white;
+  border-radius: 30rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.1);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.result-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.confidence-badge {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 10rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+/* 主要情绪 */
+.primary-emotion {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+  padding: 30rpx;
+  background: #f8f9fa;
+  border-radius: 20rpx;
+}
+
+.emotion-circle {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+  font-size: 50rpx;
+}
+
+.emotion-circle.happy { background: #fff3cd; }
+.emotion-circle.sad { background: #d1ecf1; }
+.emotion-circle.angry { background: #f8d7da; }
+.emotion-circle.fear { background: #e2e3e5; }
+.emotion-circle.disgust { background: #d4edda; }
+.emotion-circle.surprise { background: #fff0f5; }
+.emotion-circle.neutral { background: #e9ecef; }
+
+.emotion-info {
+  flex: 1;
+}
+
+.emotion-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.emotion-confidence {
+  font-size: 26rpx;
+  color: #7f8c8d;
+}
+
+/* 情绪分布图 */
+.emotion-distribution {
+  margin-bottom: 40rpx;
+}
+
+.distribution-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20rpx;
+}
+
+.distribution-chart {
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  padding: 20rpx;
+}
+
+.emotion-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.emotion-bar:last-child {
+  margin-bottom: 0;
+}
+
+.bar-label {
+  width: 100rpx;
+  font-size: 24rpx;
+  color: #2c3e50;
+}
+
+.bar-wrapper {
+  flex: 1;
+  height: 20rpx;
+  background: #e9ecef;
+  border-radius: 10rpx;
+  margin: 0 20rpx;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 10rpx;
+  transition: width 0.5s ease;
+}
+
+.bar-fill.happy { background: #f39c12; }
+.bar-fill.sad { background: #3498db; }
+.bar-fill.angry { background: #e74c3c; }
+.bar-fill.fear { background: #9b59b6; }
+.bar-fill.disgust { background: #27ae60; }
+.bar-fill.surprise { background: #e67e22; }
+.bar-fill.neutral { background: #95a5a6; }
+
+.bar-value {
+  width: 80rpx;
+  font-size: 24rpx;
+  color: #2c3e50;
+  text-align: right;
+}
+
+/* 情绪指标 */
+.emotion-metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40rpx;
+}
+
+.metric-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  margin: 0 10rpx;
+}
+
+.metric-item:first-child {
+  margin-left: 0;
+}
+
+.metric-item:last-child {
+  margin-right: 0;
+}
+
+.metric-label {
+  font-size: 24rpx;
+  color: #7f8c8d;
+  margin-bottom: 10rpx;
+}
+
+.metric-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10rpx;
+}
+
+.metric-level {
+  font-size: 22rpx;
+  padding: 5rpx 15rpx;
+  border-radius: 10rpx;
+  color: white;
+}
+
+.metric-level.high {
+  background: #e74c3c;
+}
+
+.metric-level.medium {
+  background: #f39c12;
+}
+
+.metric-level.low {
+  background: #27ae60;
+}
+
+/* 详细分析 */
+.analysis-section {
+  margin-bottom: 40rpx;
+}
+
+.analysis-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20rpx;
+}
+
+.analysis-content {
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  padding: 20rpx;
+}
+
+.analysis-item {
+  margin-bottom: 15rpx;
+}
+
+.analysis-item:last-child {
+  margin-bottom: 0;
+}
+
+.analysis-label {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.analysis-value {
+  font-size: 26rpx;
+  color: #7f8c8d;
+}
+
+.suggestions {
+  margin-top: 10rpx;
+}
+
+.suggestion-item {
+  font-size: 24rpx;
+  color: #27ae60;
+  line-height: 1.5;
+  margin-bottom: 5rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-button {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 15rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  border: none;
+}
+
+.action-button.secondary {
+  background: #ecf0f1;
+  color: #2c3e50;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+/* 历史记录预览 */
+.history-preview {
+  background: white;
+  border-radius: 30rpx;
+  padding: 40rpx;
+  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.1);
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.preview-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.preview-more {
+  font-size: 24rpx;
+  color: #3498db;
+}
+
+.preview-list {
+  max-height: 300rpx;
+  overflow-y: auto;
+}
+
+.preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #ecf0f1;
+}
+
+.preview-item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.emotion-emoji-small {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-emotion {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5rpx;
+}
+
+.item-time {
+  font-size: 22rpx;
+  color: #7f8c8d;
+}
+
+.item-right {
+  text-align: right;
+}
+
+.item-confidence {
+  font-size: 26rpx;
+  color: #3498db;
+  font-weight: bold;
+}

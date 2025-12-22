@@ -1,0 +1,534 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding-bottom: 40rpx;
+}
+
+/* 步骤指示器 */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx 40rpx;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step-number {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+  background: #007AFF;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.step-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.step.active .step-text {
+  color: white;
+  font-weight: 600;
+}
+
+.step-line {
+  width: 80rpx;
+  height: 4rpx;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0 20rpx 40rpx;
+  transition: all 0.3s ease;
+}
+
+.step-line.active {
+  background: #007AFF;
+}
+
+/* 内容卡片 */
+.content-card {
+  margin: 0 30rpx;
+  background: white;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.card-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.card-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 要求列表 */
+.requirements {
+  margin-bottom: 40rpx;
+}
+
+.requirement-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.icon {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  font-size: 20rpx;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
+  margin-top: 4rpx;
+}
+
+.icon.success {
+  background: #52c41a;
+}
+
+.requirement-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* 示例文本 */
+.sample-text {
+  margin-bottom: 40rpx;
+}
+
+.text-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.text-content {
+  background: #f8f9fa;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx solid #e9ecef;
+}
+
+.sample-text-content {
+  font-size: 32rpx;
+  color: #333;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.change-text-btn {
+  width: 100%;
+  height: 80rpx;
+  background: transparent;
+  border: 2rpx solid #007AFF;
+  color: #007AFF;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+/* 按钮样式 */
+.next-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #007AFF 0%, #00C6FF 100%);
+  color: white;
+  border: none;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.next-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.next-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+/* 样本显示 */
+.sample-display {
+  margin-bottom: 40rpx;
+}
+
+.sample-text-large {
+  background: #f0f8ff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  font-size: 36rpx;
+  color: #333;
+  text-align: center;
+  line-height: 1.6;
+  border: 2rpx solid #b3d9ff;
+  font-weight: 500;
+}
+
+/* 录音控制 */
+.recording-control {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.recording-status {
+  margin-bottom: 30rpx;
+}
+
+.status-text {
+  font-size: 32rpx;
+  color: #666;
+}
+
+.status-text.recording {
+  color: #ff4757;
+  font-weight: 600;
+}
+
+.status-text.success {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+/* 录音按钮 */
+.record-btn-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.record-btn {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 32rpx rgba(238, 90, 111, 0.3);
+  transition: all 0.3s ease;
+}
+
+.record-btn:active {
+  transform: scale(0.95);
+}
+
+.record-btn.recording {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  box-shadow: 0 12rpx 32rpx rgba(82, 196, 26, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 12rpx 32rpx rgba(82, 196, 26, 0.3);
+  }
+  50% {
+    box-shadow: 0 12rpx 32rpx rgba(82, 196, 26, 0.6);
+  }
+  100% {
+    box-shadow: 0 12rpx 32rpx rgba(82, 196, 26, 0.3);
+  }
+}
+
+.record-btn-inner {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.record-icon {
+  font-size: 60rpx;
+}
+
+/* 录音信息 */
+.recording-info {
+  margin-bottom: 20rpx;
+}
+
+.duration {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.tip {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 波形显示 */
+.waveform {
+  margin: 30rpx 0;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wave-bars {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.wave-bar {
+  width: 8rpx;
+  margin: 0 4rpx;
+  background: linear-gradient(to top, #007AFF, #00C6FF);
+  border-radius: 4rpx;
+  transition: height 0.1s ease;
+}
+
+/* 播放控制 */
+.playback-section {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.play-btn, .rerecord-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  border: none;
+  font-size: 28rpx;
+}
+
+.play-btn {
+  background: #52c41a;
+  color: white;
+}
+
+.rerecord-btn {
+  background: #ff4757;
+  color: white;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  margin-top: 40rpx;
+}
+
+/* 样本进度 */
+.sample-progress {
+  margin: 30rpx 30rpx 0;
+  text-align: center;
+}
+
+.progress-text {
+  display: block;
+  font-size: 28rpx;
+  color: white;
+  margin-bottom: 16rpx;
+}
+
+.progress-bar {
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: white;
+  transition: width 0.3s ease;
+}
+
+/* 完成动画 */
+.completion-animation {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.success-icon {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 60rpx;
+  font-weight: bold;
+  margin: 0 auto;
+  box-shadow: 0 12rpx 32rpx rgba(82, 196, 26, 0.3);
+  animation: successPulse 2s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 完成信息 */
+.completion-info {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.completion-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.completion-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 注册详情 */
+.registration-details {
+  background: #f8f9fa;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 完成操作 */
+.completion-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.verify-btn, .home-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  border: none;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.verify-btn {
+  background: linear-gradient(135deg, #007AFF 0%, #00C6FF 100%);
+  color: white;
+}
+
+.home-btn {
+  background: #f8f9fa;
+  color: #333;
+  border: 2rpx solid #e9ecef;
+}
+
+/* 录音提示 */
+.recording-tips {
+  margin: 30rpx;
+}
+
+.tip-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.tip-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.tip-list {
+  background: transparent;
+}
+
+.tip-item {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+}
+
+.tip-item:last-child {
+  margin-bottom: 0;
+}

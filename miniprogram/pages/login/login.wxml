@@ -1,0 +1,107 @@
+<view class="container">
+  <!-- 顶部背景 -->
+  <view class="header-bg">
+    <view class="bg-decoration">
+      <view class="circle circle-1"></view>
+      <view class="circle circle-2"></view>
+      <view class="circle circle-3"></view>
+    </view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <!-- Logo和标题 -->
+    <view class="logo-section">
+      <view class="logo">
+        <image src="/images/logo.png" mode="aspectFit" wx:if="{{false}}"></image>
+        <text class="logo-text" wx:else>🎤</text>
+      </view>
+      <text class="app-title">声纹识别系统</text>
+      <text class="app-desc">企业级智能身份识别解决方案</text>
+    </view>
+
+    <!-- 登录区域 -->
+    <view class="login-section">
+      <view class="login-card">
+        <!-- 功能介绍 -->
+        <view class="features">
+          <view class="feature-item">
+            <view class="feature-icon">🔐</view>
+            <text class="feature-text">安全可靠</text>
+          </view>
+          <view class="feature-item">
+            <view class="feature-icon">⚡</view>
+            <text class="feature-text">快速识别</text>
+          </view>
+          <view class="feature-item">
+            <view class="feature-icon">👥</view>
+            <text class="feature-text">多人支持</text>
+          </view>
+        </view>
+
+        <!-- 登录按钮 -->
+        <button class="login-btn" bindtap="wxLogin" disabled="{{logging}}">
+          <view class="btn-content" wx:if="{{!logging}}">
+            <view class="wx-icon">
+              <text>🟢</text>
+            </view>
+            <text class="btn-text">微信登录</text>
+          </view>
+          <view class="btn-content" wx:else>
+            <text class="loading-text">登录中...</text>
+          </view>
+        </button>
+
+        <!-- 登录说明 -->
+        <view class="login-tips">
+          <text class="tip-text">• 登录即表示同意用户协议和隐私政策</text>
+          <text class="tip-text">• 本系统仅限企业内部员工使用</text>
+          <text class="tip-text">• 声纹信息将加密存储，保障隐私安全</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 系统特性 -->
+    <view class="system-features">
+      <view class="feature-title">
+        <text>核心功能</text>
+      </view>
+      <view class="feature-grid">
+        <view class="feature-card">
+          <view class="card-icon">🎙️</view>
+          <text class="card-title">声纹注册</text>
+          <text class="card-desc">录制3个声音样本建立声纹特征</text>
+        </view>
+        <view class="feature-card">
+          <view class="card-icon">✅</view>
+          <text class="card-title">身份验证</text>
+          <text class="card-desc">实时语音身份识别验证</text>
+        </view>
+        <view class="feature-card">
+          <view class="card-icon">📝</view>
+          <text class="card-title">会议记录</text>
+          <text class="card-desc">自动识别发言者身份</text>
+        </view>
+        <view class="feature-card">
+          <view class="card-icon">📊</view>
+          <text class="card-title">数据分析</text>
+          <text class="card-desc">识别准确率统计分析</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <text class="version-text">Version 1.0.0</text>
+      <text class="company-text">© 2024 声纹识别系统</text>
+    </view>
+  </view>
+</view>
+
+<!-- 登录中遮罩 -->
+<view class="loading-overlay" wx:if="{{logging}}">
+  <view class="loading-content">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在登录中...</text>
+  </view>
+</view>

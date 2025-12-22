@@ -1,0 +1,194 @@
+<view class="container">
+  <!-- 顶部步骤指示器 -->
+  <view class="step-indicator">
+    <view class="step {{currentStep >= 1 ? 'active' : ''}}">
+      <text class="step-number">1</text>
+      <text class="step-text">准备</text>
+    </view>
+    <view class="step-line {{currentStep >= 2 ? 'active' : ''}}"></view>
+    <view class="step {{currentStep >= 2 ? 'active' : ''}}">
+      <text class="step-number">2</text>
+      <text class="step-text">录音</text>
+    </view>
+    <view class="step-line {{currentStep >= 3 ? 'active' : ''}}"></view>
+    <view class="step {{currentStep >= 3 ? 'active' : ''}}">
+      <text class="step-number">3</text>
+      <text class="step-text">完成</text>
+    </view>
+  </view>
+
+  <!-- 步骤1: 准备 -->
+  <view class="step-content" wx:if="{{currentStep === 1}}">
+    <view class="content-card">
+      <view class="card-header">
+        <text class="card-title">声纹注册准备</text>
+        <text class="card-subtitle">请在安静环境下进行录制</text>
+      </view>
+      
+      <view class="requirements">
+        <view class="requirement-item">
+          <view class="icon success">✓</view>
+          <text class="requirement-text">选择安静的环境，避免噪音干扰</text>
+        </view>
+        <view class="requirement-item">
+          <view class="icon success">✓</view>
+          <text class="requirement-text">保持手机距离嘴巴15-20厘米</text>
+        </view>
+        <view class="requirement-item">
+          <view class="icon success">✓</view>
+          <text class="requirement-text">用正常语速清晰地朗读</text>
+        </view>
+        <view class="requirement-item">
+          <view class="icon success">✓</view>
+          <text class="requirement-text">准备录制3个声音样本</text>
+        </view>
+      </view>
+
+      <view class="sample-text">
+        <text class="text-label">请朗读以下文本：</text>
+        <view class="text-content">
+          <text class="sample-text-content">{{currentSampleText}}</text>
+        </view>
+        <button class="change-text-btn" bindtap="changeSampleText">
+          <text>换一段文本</text>
+        </button>
+      </view>
+
+      <button class="next-btn" bindtap="nextStep">
+        <text>开始录音</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 步骤2: 录音 -->
+  <view class="step-content" wx:if="{{currentStep === 2}}">
+    <view class="content-card">
+      <view class="card-header">
+        <text class="card-title">录制第{{currentSampleIndex + 1}}个样本</text>
+        <text class="card-subtitle">请朗读显示的文本内容</text>
+      </view>
+
+      <view class="sample-display">
+        <view class="sample-text-large">{{currentSampleText}}</view>
+      </view>
+
+      <!-- 录音控制 -->
+      <view class="recording-control">
+        <view class="recording-status">
+          <text class="status-text" wx:if="{{!isRecording && !hasRecording}}">
+            准备录音
+          </text>
+          <text class="status-text recording" wx:if="{{isRecording}}">
+            正在录音...
+          </text>
+          <text class="status-text success" wx:if="{{hasRecording && !isRecording}}">
+            录音完成
+          </text>
+        </view>
+
+        <!-- 录音按钮 -->
+        <view class="record-btn-container">
+          <button 
+            class="record-btn {{isRecording ? 'recording' : ''}}" 
+            bindtap="toggleRecording"
+            disabled="{{processing}}"
+          >
+            <view class="record-btn-inner">
+              <text class="record-icon">{{isRecording ? '⏸' : '🎤'}}</text>
+            </view>
+          </button>
+        </view>
+
+        <!-- 录音时长 -->
+        <view class="recording-info">
+          <text class="duration">{{formatTime(recordingDuration)}}</text>
+          <text class="tip">{{isRecording ? '点击停止录音' : '点击开始录音'}}</text>
+        </view>
+
+        <!-- 音频波形显示 -->
+        <view class="waveform" wx:if="{{isRecording || hasRecording}}">
+          <view class="wave-bars">
+            <view class="wave-bar" wx:for="{{waveformData}}" wx:key="index" 
+                  style="height: {{item}}rpx;"></view>
+          </view>
+        </view>
+
+        <!-- 播放录音 -->
+        <view class="playback-section" wx:if="{{hasRecording && !isRecording}}">
+          <button class="play-btn" bindtap="playRecording">
+            <text>播放录音</text>
+          </button>
+          <button class="rerecord-btn" bindtap="rerecord">
+            <text>重新录音</text>
+          </button>
+        </view>
+      </view>
+
+      <!-- 下一步按钮 -->
+      <view class="action-buttons" wx:if="{{hasRecording && !isRecording}}">
+        <button class="next-btn" bindtap="nextSample" disabled="{{processing}}">
+          <text>{{currentSampleIndex < 2 ? '下一个样本' : '完成注册'}}</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 样本进度 -->
+    <view class="sample-progress">
+      <text class="progress-text">样本进度：{{currentSampleIndex + 1}}/3</text>
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{(currentSampleIndex + 1) / 3 * 100}}%"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤3: 完成 -->
+  <view class="step-content" wx:if="{{currentStep === 3}}">
+    <view class="content-card">
+      <view class="completion-animation">
+        <view class="success-icon">✓</view>
+      </view>
+      
+      <view class="completion-info">
+        <text class="completion-title">声纹注册成功！</text>
+        <text class="completion-desc">您已成功完成声纹注册，现在可以使用声纹验证功能了。</text>
+      </view>
+
+      <view class="registration-details">
+        <view class="detail-item">
+          <text class="detail-label">注册时间：</text>
+          <text class="detail-value">{{registrationTime}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">样本数量：</text>
+          <text class="detail-value">3个</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">质量评估：</text>
+          <text class="detail-value">良好</text>
+        </view>
+      </view>
+
+      <view class="completion-actions">
+        <button class="verify-btn" bindtap="goToVerify">
+          <text>立即验证</text>
+        </button>
+        <button class="home-btn" bindtap="goHome">
+          <text>返回首页</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 录音提示 -->
+  <view class="recording-tips" wx:if="{{currentStep === 2}}">
+    <view class="tip-card">
+      <text class="tip-title">录音小贴士</text>
+      <view class="tip-list">
+        <text class="tip-item">• 请朗读显示的文本，不要偏离</text>
+        <text class="tip-item">• 保持语速适中，不要过快或过慢</text>
+        <text class="tip-item">• 录音时间控制在5-10秒最佳</text>
+        <text class="tip-item">• 如有噪音干扰，请重新录音</text>
+      </view>
+    </view>
+  </view>
+</view>

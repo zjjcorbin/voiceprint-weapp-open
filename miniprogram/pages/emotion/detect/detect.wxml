@@ -1,0 +1,218 @@
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="nav-bar">
+      <view class="nav-title">情绪识别</view>
+      <view class="nav-subtitle">智能语音情绪分析</view>
+    </view>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <view class="main-content">
+    <!-- 情绪识别卡片 -->
+    <view class="emotion-card">
+      <view class="card-header">
+        <view class="card-title">语音情绪检测</view>
+        <view class="card-subtitle">录制语音，AI智能分析情绪状态</view>
+      </view>
+      
+      <!-- 录音区域 -->
+      <view class="record-section">
+        <view class="record-button-wrapper">
+          <view 
+            class="record-button {{isRecording ? 'recording' : ''}}"
+            bindtap="{{isRecording ? stopRecording : startRecording}}"
+          >
+            <image 
+              class="record-icon" 
+              src="{{isRecording ? '/images/stop.png' : '/images/microphone.png'}}"
+            ></image>
+          </view>
+          <view class="record-text">
+            {{isRecording ? '点击停止录音' : '点击开始录音'}}
+          </view>
+        </view>
+
+        <!-- 录音状态 -->
+        <view class="record-status" wx:if="{{isRecording || audioUrl}}">
+          <view class="status-item">
+            <text class="status-label">录音时长：</text>
+            <text class="status-value">{{recordingTime}}秒</text>
+          </view>
+          <view class="status-item" wx:if="{{audioUrl}}">
+            <text class="status-label">录音状态：</text>
+            <text class="status-value success">已完成</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 音频播放器 -->
+      <view class="audio-player" wx:if="{{audioUrl}}">
+        <view class="player-controls">
+          <image 
+            class="play-button" 
+            src="{{isPlaying ? '/images/pause.png' : '/images/play.png'}}"
+            bindtap="togglePlay"
+          ></image>
+          <view class="audio-info">
+            <text class="audio-duration">{{audioDuration}}秒</text>
+          </view>
+        </view>
+        <audio 
+          id="audioPlayer"
+          src="{{audioUrl}}"
+          bindplay="onAudioPlay"
+          bindpause="onAudioPause"
+          bindtimeupdate="onTimeUpdate"
+          bindended="onAudioEnded"
+        ></audio>
+      </view>
+
+      <!-- 检测按钮 -->
+      <view class="detect-section" wx:if="{{audioUrl && !detecting}}">
+        <button 
+          class="detect-button"
+          bindtap="detectEmotion"
+        >
+          开始情绪检测
+        </button>
+      </view>
+
+      <!-- 检测中状态 -->
+      <view class="detecting-section" wx:if="{{detecting}}">
+        <view class="loading-animation">
+          <view class="loading-circle"></view>
+        </view>
+        <text class="loading-text">正在分析情绪状态...</text>
+        <text class="loading-subtext">{{loadingText}}</text>
+      </view>
+    </view>
+
+    <!-- 情绪识别结果 -->
+    <view class="result-section" wx:if="{{emotionResult}}">
+      <view class="result-header">
+        <view class="result-title">情绪分析结果</view>
+        <view class="confidence-badge">
+          置信度 {{emotionResult.confidence}}%
+        </view>
+      </view>
+
+      <!-- 主要情绪 -->
+      <view class="primary-emotion">
+        <view class="emotion-circle {{emotionResult.dominant_emotion}}">
+          <text class="emotion-emoji">{{getEmotionEmoji(emotionResult.dominant_emotion)}}</text>
+        </view>
+        <view class="emotion-info">
+          <text class="emotion-name">{{getEmotionNameCN(emotionResult.dominant_emotion)}}</text>
+          <text class="emotion-confidence">置信度: {{emotionResult.confidence}}%</text>
+        </view>
+      </view>
+
+      <!-- 情绪分布图 -->
+      <view class="emotion-distribution">
+        <view class="distribution-title">情绪分布</view>
+        <view class="distribution-chart">
+          <view 
+            class="emotion-bar" 
+            wx:for="{{emotionResult.emotion_probabilities}}" 
+            wx:key="emotion"
+            wx:for-item="prob"
+          >
+            <view class="bar-label">{{getEmotionNameCN(prob.emotion)}}</view>
+            <view class="bar-wrapper">
+              <view 
+                class="bar-fill {{prob.emotion}}"
+                style="width: {{prob.probability * 100}}%"
+              ></view>
+            </view>
+            <view class="bar-value">{{(prob.probability * 100).toFixed(1)}}%</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 情绪强度 -->
+      <view class="emotion-metrics">
+        <view class="metric-item">
+          <view class="metric-label">情绪强度</view>
+          <view class="metric-value">{{emotionResult.intensity}}</view>
+          <view class="metric-level {{getIntensityLevel(emotionResult.intensity)}}">
+            {{getIntensityText(emotionResult.intensity)}}
+          </view>
+        </view>
+        <view class="metric-item">
+          <view class="metric-label">情绪复杂度</view>
+          <view class="metric-value">{{emotionResult.complexity}}</view>
+          <view class="metric-level {{getComplexityLevel(emotionResult.complexity)}}">
+            {{getComplexityText(emotionResult.complexity)}}
+          </view>
+        </view>
+        <view class="metric-item">
+          <view class="metric-label">音频质量</view>
+          <view class="metric-value">{{emotionResult.quality_score}}</view>
+          <view class="metric-level {{getQualityLevel(emotionResult.quality_score)}}">
+            {{getQualityText(emotionResult.quality_score)}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 详细分析 -->
+      <view class="analysis-section" wx:if="{{emotionResult.analysis}}">
+        <view class="analysis-title">详细分析</view>
+        <view class="analysis-content">
+          <view class="analysis-item">
+            <text class="analysis-label">置信度等级：</text>
+            <text class="analysis-value">{{emotionResult.analysis.confidence_level}}</text>
+          </view>
+          <view class="analysis-item">
+            <text class="analysis-label">建议：</text>
+            <view class="suggestions">
+              <text 
+                class="suggestion-item" 
+                wx:for="{{emotionResult.analysis.suggestions}}" 
+                wx:key="*this"
+              >{{item}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="action-buttons">
+        <button class="action-button secondary" bindtap="resetDetection">
+          重新检测
+        </button>
+        <button class="action-button primary" bindtap="saveResult">
+          保存结果
+        </button>
+      </view>
+    </view>
+
+    <!-- 历史记录预览 -->
+    <view class="history-preview" wx:if="{{historyRecords.length > 0}}">
+      <view class="preview-header">
+        <text class="preview-title">最近记录</text>
+        <text class="preview-more" bindtap="goToHistory">查看全部</text>
+      </view>
+      <view class="preview-list">
+        <view 
+          class="preview-item" 
+          wx:for="{{historyRecords}}" 
+          wx:key="id"
+          bindtap="goToDetail"
+          data-id="{{item.id}}"
+        >
+          <view class="item-left">
+            <view class="emotion-emoji-small">{{getEmotionEmoji(item.dominant_emotion)}}</view>
+            <view class="item-info">
+              <text class="item-emotion">{{getEmotionNameCN(item.dominant_emotion)}}</text>
+              <text class="item-time">{{item.created_at}}</text>
+            </view>
+          </view>
+          <view class="item-right">
+            <text class="item-confidence">{{item.confidence}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

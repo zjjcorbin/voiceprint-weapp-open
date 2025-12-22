@@ -1,0 +1,187 @@
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-avatar">
+      <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" wx:if="{{userInfo.avatarUrl}}"></image>
+      <view class="avatar-placeholder" wx:else>
+        <text class="avatar-text">{{userInfo.name ? userInfo.name.charAt(0) : '用'}}</text>
+      </view>
+    </view>
+    <view class="user-info">
+      <text class="user-name">{{userInfo.name || '未设置'}}</text>
+      <text class="user-department">{{userInfo.department || '未设置部门'}}</text>
+      <text class="user-id">工号：{{userInfo.employeeId || '未设置'}}</text>
+    </view>
+    <view class="voiceprint-status">
+      <view class="status-badge {{voiceprintStatus.registered ? 'registered' : 'unregistered'}}">
+        <text class="status-text">{{voiceprintStatus.registered ? '已注册' : '未注册'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 声纹信息 -->
+  <view class="voiceprint-info" wx:if="{{voiceprintStatus.registered}}">
+    <view class="info-header">
+      <text class="info-title">声纹信息</text>
+    </view>
+    <view class="info-grid">
+      <view class="info-item">
+        <text class="info-label">样本数量</text>
+        <text class="info-value">{{voiceprintStatus.sampleCount}}个</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">注册时间</text>
+        <text class="info-value">{{formatDate(voiceprintStatus.registrationTime)}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">识别准确率</text>
+        <text class="info-value">{{voiceprintStatus.accuracy}}%</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">验证次数</text>
+        <text class="info-value">{{verificationStats.totalCount}}次</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-group">
+      <text class="group-title">声纹管理</text>
+      <view class="menu-item" bindtap="goToRegister" wx:if="{{!voiceprintStatus.registered}}">
+        <view class="menu-icon register">
+          <text>🎤</text>
+        </view>
+        <text class="menu-text">注册声纹</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="goToVerify">
+        <view class="menu-icon verify">
+          <text>✅</text>
+        </view>
+        <text class="menu-text">验证身份</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="reRegister" wx:if="{{voiceprintStatus.registered}}">
+        <view class="menu-icon update">
+          <text>🔄</text>
+        </view>
+        <text class="menu-text">重新注册</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <text class="group-title">使用统计</text>
+      <view class="menu-item" bindtap="viewVerificationHistory">
+        <view class="menu-icon history">
+          <text>📊</text>
+        </view>
+        <text class="menu-text">验证历史</text>
+        <view class="menu-badge" wx:if="{{verificationStats.recentCount > 0}}">
+          <text>{{verificationStats.recentCount}}</text>
+        </view>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="viewAccuracyStats">
+        <view class="menu-icon stats">
+          <text>📈</text>
+        </view>
+        <text class="menu-text">准确率统计</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <text class="group-title">设置</text>
+      <view class="menu-item" bindtap="editProfile">
+        <view class="menu-icon edit">
+          <text>✏️</text>
+        </view>
+        <text class="menu-text">编辑资料</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="viewPrivacyPolicy">
+        <view class="menu-icon privacy">
+          <text>🔒</text>
+        </view>
+        <text class="menu-text">隐私政策</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="contactSupport">
+        <view class="menu-icon support">
+          <text>💬</text>
+        </view>
+        <text class="menu-text">联系支持</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 验证历史列表 -->
+  <view class="history-section" wx:if="{{verificationHistory.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">最近验证记录</text>
+      <text class="view-all" bindtap="viewAllHistory">查看全部</text>
+    </view>
+    <view class="history-list">
+      <view class="history-item {{item.success ? 'success' : 'fail'}}" 
+            wx:for="{{verificationHistory}}" wx:key="id" 
+            bindtap="viewHistoryDetail" data-id="{{item.id}}">
+        <view class="history-time">{{formatDateTime(item.createdAt)}}</view>
+        <view class="history-result">
+          <text class="result-text">{{item.success ? '成功' : '失败'}}</text>
+          <text class="confidence" wx:if="{{item.success}}">{{(item.confidence * 100).toFixed(1)}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="logout">
+      <text>退出登录</text>
+    </button>
+  </view>
+</view>
+
+<!-- 编辑资料弹窗 -->
+<view class="edit-modal" wx:if="{{showEditModal}}">
+  <view class="modal-overlay" bindtap="closeEditModal"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">编辑资料</text>
+      <text class="modal-close" bindtap="closeEditModal">✕</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-item">
+        <text class="form-label">姓名</text>
+        <input class="form-input" 
+               placeholder="请输入姓名" 
+               value="{{editForm.name}}" 
+               bindinput="onNameInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">部门</text>
+        <input class="form-input" 
+               placeholder="请输入部门" 
+               value="{{editForm.department}}" 
+               bindinput="onDepartmentInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">工号</text>
+        <input class="form-input" 
+               placeholder="请输入工号" 
+               value="{{editForm.employeeId}}" 
+               bindinput="onEmployeeIdInput" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="cancel-btn" bindtap="closeEditModal">取消</button>
+      <button class="confirm-btn" bindtap="saveProfile" disabled="{{saving}}">
+        <text wx:if="{{!saving}}">保存</text>
+        <text wx:else>保存中...</text>
+      </button>
+    </view>
+  </view>
+</view>
