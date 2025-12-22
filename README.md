@@ -556,9 +556,9 @@ r.setex(f"voiceprint:{employee_id}", 86400, embedding_json)
 
 ## 📞 技术支持
 
-- 📧 邮箱: support@voiceprint-system.com
+- 📧 邮箱: csgyp@v189.cn
 - 📱 微信: VoiceprintSupport
-- 🐛 问题反馈: [GitHub Issues](https://github.com/your-org/voiceprint-weapp-open/issues)
+- 🐛 问题反馈: [GitHub Issues](https://github.com/zjjcorbin/voiceprint-weapp-open/issues)
 
 ## 🗺️ 发展路线图
 
