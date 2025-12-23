@@ -2,6 +2,16 @@ from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 
 
+class EmotionResult(BaseModel):
+    """情绪识别结果"""
+    success: bool = Field(..., description="识别是否成功")
+    emotion: str = Field(..., description="识别出的情绪")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="置信度")
+    message: str = Field(..., description="结果消息")
+    processing_time: float = Field(..., ge=0, description="处理时间（秒）")
+    timestamp: str = Field(..., description="识别时间戳")
+
+
 class EmotionFeature(BaseModel):
     """情绪特征"""
     dominant_emotion: str = Field(..., description="主要情绪")
