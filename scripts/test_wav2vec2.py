@@ -14,7 +14,6 @@ def test_wav2vec2_dependencies():
         "torch",
         "transformers", 
         "huggingface_hub",
-        "huggingface_transformers",
         "speechbrain"
     ]
     

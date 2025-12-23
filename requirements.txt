@@ -25,7 +25,7 @@ torchaudio-augmentations==0.2.0
 # 声纹识别 - SpeechBrain
 speechbrain>=0.5.15
 transformers==4.35.2
-huggingface-transformers>=4.20.0
+# 注意：huggingface-transformers 不是正确的包名，应该使用 transformers
 
 # 情绪识别
 torch==2.1.0
