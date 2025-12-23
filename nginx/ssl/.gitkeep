@@ -1,0 +1,2 @@
+# This file ensures the SSL directory is tracked by git
+# SSL certificates should NOT be committed to version control
