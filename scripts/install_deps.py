@@ -27,6 +27,16 @@ def install_dependencies():
     print("安装声纹识别系统依赖")
     print("=" * 50)
     
+    # 0. 检查Python版本
+    import sys
+    python_version = sys.version_info
+    print(f"\n0. Python版本: {python_version.major}.{python_version.minor}.{python_version.micro}")
+    
+    if python_version < (3, 8):
+        print("⚠️ 警告：建议使用Python 3.8+")
+    elif python_version >= (3, 12):
+        print("⚠️ 警告：某些包可能不兼容Python 3.12+")
+    
     # 1. 更新pip
     print("\n1. 更新pip...")
     run_command("python -m pip install --upgrade pip", "更新pip")
