@@ -122,9 +122,10 @@ install_dependencies() {
     
     # 激活虚拟环境并安装依赖
     source venv/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
     
+    pip install --upgrade pip
+    pip install --upgrade setuptools wheel
+    pip install -r requirements.txt
     log_info "Python依赖安装完成"
 }
 
@@ -132,37 +133,22 @@ install_dependencies() {
 download_models() {
     log_info "下载预训练模型..."
     
+    # 激活虚拟环境
     source venv/bin/activate
+    
+    # 检查speechbrain是否安装
+    if ! python -c "import speechbrain" 2>/dev/null; then
+        log_warn "SpeechBrain未安装，跳过模型下载"
+        log_info "模型将在首次使用时自动下载"
+        return
+    fi
     
     # 创建模型目录
     mkdir -p pretrained_models/voiceprint
     mkdir -p pretrained_models/emotion
     
-    # Python脚本下载模型
-    python3 - <<'EOF'
-import os
-from speechbrain.inference.speaker import SpeakerRecognition
-from speechbrain.inference.classifiers import EncoderClassifier
-
-try:
-    print("下载声纹识别模型...")
-    spk_model = SpeakerRecognition.from_hparams(
-        source="speechbrain/spkrec-ecapa-voxceleb",
-        savedir="pretrained_models/spkrec-ecapa-voxceleb"
-    )
-    print("声纹识别模型下载完成")
-    
-    print("下载情绪识别模型...")
-    emo_model = EncoderClassifier.from_hparams(
-        source="speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
-        savedir="pretrained_models/emotion-recognition-wav2vec2-IEMOCAP"
-    )
-    print("情绪识别模型下载完成")
-    
-except Exception as e:
-    print(f"模型下载失败: {e}")
-    print("系统将在首次运行时自动下载模型")
-EOF
+    # 调用独立的模型下载脚本
+    python scripts/download_models.py
     
     log_info "模型下载完成"
 }
@@ -240,11 +226,11 @@ main() {
             check_dependencies
             create_directories
             setup_config
-            install_dependencies
-            init_database
-            init_minio
-            download_models
-            start_services
+    install_dependencies
+    download_models
+    init_database
+    init_minio
+    start_services
             show_status
             ;;
         start)
