@@ -26,7 +26,7 @@ services:
 
   # MinIO对象存储
   minio:
-    image: minio/minio:latest
+    image: fastcn-registry-changsha42.crs.ctyun.cn/hnkz/minio:latest
     container_name: voiceprint-minio
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -48,7 +48,7 @@ services:
 
   # Redis缓存 (可选)
   redis:
-    image: redis:7-alpine
+    image: fastcn-registry-changsha42.crs.ctyun.cn/hnkz/redis:7-alpine
     container_name: voiceprint-redis
     ports:
       - "6379:6379"
@@ -100,7 +100,7 @@ services:
 
   # Nginx反向代理
   nginx:
-    image: nginx:alpine
+    image: fastcn-registry-changsha42.crs.ctyun.cn/hnkz/nginx:alpine-perl
     container_name: voiceprint-nginx
     ports:
       - "80:80"
