@@ -15,6 +15,7 @@ from app.routers import emotion, auth, employee, voiceprint, meeting, speech, up
 from app.core.exceptions import VoiceprintException
 from app.services.voiceprint_service import VoiceprintService
 from app.services.emotion_service import EmotionService
+from app.utils.audio_compat import check_audio_backend
 
 
 @asynccontextmanager
@@ -42,6 +43,10 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Failed to initialize MinIO: {e}")
         raise
+    
+    # 验证音频处理栈兼容性
+    from app.utils.audio_compat import verify_audio_stack
+    verify_audio_stack()
     
     # 预加载声纹识别模型
     try:
