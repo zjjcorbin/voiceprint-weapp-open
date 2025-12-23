@@ -27,8 +27,7 @@ def check_modules():
         "speechbrain.inference.speaker",
         "speechbrain.inference.classifiers", 
         "speechbrain.inference.encoders",
-        "speechbrain.pretrained",
-        "speechbrain.lobes.models.CRNN"
+        "speechbrain.lobes.models.huggingface_transformers.wav2vec2"
     ]
     
     available_modules = []

@@ -25,12 +25,9 @@ def test_model_availability():
     ]
     
     try:
-        try:
-            from speechbrain.inference.speaker import SpeakerRecognition
-            from speechbrain.inference.classifiers import EncoderClassifier
-        except ImportError:
-            from speechbrain.pretrained import SpeakerRecognition
-            from speechbrain.pretrained import EncoderClassifier
+        # 使用新版SpeechBrain inference模块
+        from speechbrain.inference.speaker import SpeakerRecognition
+        from speechbrain.inference.classifiers import EncoderClassifier
         
         print("测试声纹识别模型...")
         for model in speaker_models:

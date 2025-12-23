@@ -11,13 +11,9 @@ def download_models():
     print("开始下载预训练模型...")
     
     try:
-        # 尝试导入SpeechBrain（兼容不同版本）
-        try:
-            from speechbrain.inference.speaker import SpeakerRecognition
-            from speechbrain.inference.classifiers import EncoderClassifier
-        except ImportError:
-            from speechbrain.pretrained import SpeakerRecognition
-            from speechbrain.pretrained import EncoderClassifier
+        # 导入SpeechBrain (使用新版inference模块)
+        from speechbrain.inference.speaker import SpeakerRecognition
+        from speechbrain.inference.classifiers import EncoderClassifier
         
         # 创建模型目录
         os.makedirs("pretrained_models/spkrec-ecapa-voxceleb", exist_ok=True)

@@ -4,15 +4,8 @@ import torch
 import torchaudio
 import webrtcvad
 import soundfile as sf
-try:
-    from speechbrain.inference.speaker import SpeakerRecognition
-except ImportError:
-    from speechbrain.pretrained import SpeakerRecognition
-
-try:
-    from speechbrain.inference.encoders import MelSpectrogramEncoder
-except ImportError:
-    from speechbrain.lobes.models.CRNN import MelSpectrogramEncoder
+from speechbrain.inference.speaker import SpeakerRecognition
+from speechbrain.inference.encoders import MelSpectrogramEncoder
 from scipy import signal
 from scipy.stats import entropy
 from typing import List, Dict, Tuple, Optional
