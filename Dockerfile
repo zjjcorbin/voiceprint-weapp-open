@@ -12,7 +12,10 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
-
+RUN mkdir -p /root/.config/pip/ && \
+    echo "[global]" > /root/.config/pip/pip.conf && \
+    echo "index-url = https://pypi.tuna.tsinghua.edu.cn/simple" >> /root/.config/pip/pip.conf && \
+    echo "trusted-host = pypi.tuna.tsinghua.edu.cn" >> /root/.config/pip/pip.conf
 # 复制requirements文件
 COPY requirements.txt .
 
