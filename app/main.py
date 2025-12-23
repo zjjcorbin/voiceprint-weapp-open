@@ -9,7 +9,7 @@ from loguru import logger
 import os
 
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.models.database import engine, Base
 from app.core.minio_client import minio_client
 from app.routers import emotion, auth, employee, voiceprint, meeting, speech, upload, system
 from app.core.exceptions import VoiceprintException

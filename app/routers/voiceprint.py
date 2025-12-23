@@ -4,7 +4,7 @@ from typing import List, Optional
 import time
 import uuid
 
-from app.core.database import get_db
+from app.models.database import get_db
 from app.models.employee import EmployeeModel
 from app.models.voiceprint import VoiceprintModel
 from app.schemas.voiceprint import (
