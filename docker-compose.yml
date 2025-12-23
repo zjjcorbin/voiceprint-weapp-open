@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # MySQL数据库
   mysql:
-    image: mysql:8.0
+    image: registry.cn-hangzhou.aliyuncs.com/library/mysql:8.0
     container_name: voiceprint-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root123
@@ -26,7 +26,7 @@ services:
 
   # MinIO对象存储
   minio:
-    image: minio/minio:latest
+    image: registry.cn-hangzhou.aliyuncs.com/library/minio:latest
     container_name: voiceprint-minio
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -48,7 +48,7 @@ services:
 
   # Redis缓存 (可选)
   redis:
-    image: redis:7-alpine
+    image: registry.cn-hangzhou.aliyuncs.com/library/redis:7-alpine
     container_name: voiceprint-redis
     ports:
       - "6379:6379"
@@ -100,7 +100,7 @@ services:
 
   # Nginx反向代理
   nginx:
-    image: nginx:alpine
+    image: registry.cn-hangzhou.aliyuncs.com/library/nginx:alpine
     container_name: voiceprint-nginx
     ports:
       - "80:80"
