@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM fastcn-registry-changsha42.crs.ctyun.cn/hnkz/python:3.10-slim
 
 # 设置工作目录
 WORKDIR /app

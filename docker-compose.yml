@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # MySQL数据库
   mysql:
-    image: mysql:8.0
+    image: fastcn-registry-changsha42.crs.ctyun.cn/hnkz/mysql:8.0
     container_name: voiceprint-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root123
