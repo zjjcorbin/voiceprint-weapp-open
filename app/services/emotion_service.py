@@ -76,7 +76,8 @@ class EmotionService:
             logger.error(f"Failed to initialize emotion model: {e}")
             # 备用方案：尝试不同的模型
             backup_models = [
-                "speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
+                "speechbrain/emotion-identification-IEMOCAP",
+                "speechbrain/emotion-raw-wav2vec2-IEMOCAP",
                 "speechbrain/emotion-recognition-cnn14-esc50"
             ]
             

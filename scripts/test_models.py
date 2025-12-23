@@ -60,8 +60,9 @@ def test_emotion_recognition():
     
     # 测试多个模型
     models_to_test = [
-        ("speechbrain/emotion-recognition-ecapa", "emotion_recognition_ecapa"),
         ("speechbrain/emotion-recognition-wav2vec2-IEMOCAP", "emotion_recognition_wav2vec2"),
+        ("speechbrain/emotion-identification-IEMOCAP", "emotion_identification_iemocap"),
+        ("speechbrain/emotion-raw-wav2vec2-IEMOCAP", "emotion_raw_wav2vec2"),
         ("speechbrain/emotion-recognition-cnn14-esc50", "emotion_recognition_cnn14")
     ]
     

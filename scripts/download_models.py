@@ -31,11 +31,30 @@ def download_models():
         print("声纹识别模型下载完成")
         
         print("下载情绪识别模型...")
-        emo_model = EncoderClassifier.from_hparams(
-            source="speechbrain/emotion-recognition-ecapa",
-            savedir="pretrained_models/emotion-recognition-ecapa"
-        )
-        print("情绪识别模型下载完成")
+        # 尝试多个可用的情绪识别模型
+        emotion_models = [
+            "speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
+            "speechbrain/emotion-identification-IEMOCAP",
+            "speechbrain/emotion-raw-wav2vec2-IEMOCAP"
+        ]
+        
+        emotion_model_loaded = False
+        for model_name in emotion_models:
+            try:
+                emo_model = EncoderClassifier.from_hparams(
+                    source=model_name,
+                    savedir=f"pretrained_models/{model_name.split('/')[-1]}"
+                )
+                print(f"情绪识别模型 {model_name} 下载完成")
+                emotion_model_loaded = True
+                break
+            except Exception as e:
+                print(f"模型 {model_name} 下载失败: {str(e)[:100]}")
+                continue
+        
+        if not emotion_model_loaded:
+            print("警告：所有情绪识别模型都下载失败，系统将跳过情绪识别功能")
+            print("建议：系统将在首次运行时自动尝试下载模型")
         
         print("所有模型下载完成！")
         return True
