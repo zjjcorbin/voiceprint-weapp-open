@@ -62,9 +62,9 @@ class EmotionService:
             logger.info(f"Using device: {cls._device}")
             
             # 使用SpeechBrain的情绪识别模型
-            # 这里使用IEMOCAP数据集预训练模型，支持7种情绪
+            # 使用ECAPA模型，更稳定可靠
             cls._model = EncoderClassifier.from_hparams(
-                source="speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
+                source=settings.EMOTION_MODEL,
                 savedir="pretrained_models/emotion_recognition",
                 run_opts={"device": str(cls._device)}
             )
@@ -74,18 +74,25 @@ class EmotionService:
             
         except Exception as e:
             logger.error(f"Failed to initialize emotion model: {e}")
-            # 备用方案：使用更简单的模型
-            try:
-                cls._model = EncoderClassifier.from_hparams(
-                    source="speechbrain/emotion-recognition-ecapa",
-                    savedir="pretrained_models/emotion_recognition_ecapa",
-                    run_opts={"device": str(cls._device)}
-                )
-                logger.info("Backup emotion recognition model loaded successfully")
-                return True
-            except Exception as backup_e:
-                logger.error(f"Failed to initialize backup emotion model: {backup_e}")
-                raise
+            # 备用方案：尝试不同的模型
+            backup_models = [
+                "speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
+                "speechbrain/emotion-recognition-cnn14-esc50"
+            ]
+            
+            for backup_model in backup_models:
+                try:
+                    cls._model = EncoderClassifier.from_hparams(
+                        source=backup_model,
+                        savedir=f"pretrained_models/emotion_backup_{backup_model.split('/')[-1]}",
+                        run_opts={"device": str(cls._device)}
+                    )
+                    logger.info(f"Backup emotion recognition model loaded: {backup_model}")
+                    return True
+                except Exception as backup_e:
+                    logger.warning(f"Failed to load backup model {backup_model}: {backup_e}")
+            
+            raise Exception("All emotion recognition models failed to load")
     
     async def check_model_status(self) -> bool:
         """检查模型状态"""

@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     SAMPLE_RATE: int = 16000
     
     # 情绪识别配置
-    EMOTION_MODEL: str = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+    EMOTION_MODEL: str = "speechbrain/emotion-recognition-ecapa"
     EMOTION_CONFIDENCE_THRESHOLD: float = 0.6
     SUPPORTED_EMOTIONS: list = ["neutral", "happy", "sad", "angry", "fear", "disgust", "surprise"]
     EMOTION_ANALYSIS_ENABLED: bool = True
