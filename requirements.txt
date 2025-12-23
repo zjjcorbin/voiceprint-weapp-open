@@ -23,7 +23,7 @@ torchaudio==2.1.0
 torchaudio-augmentations==0.2.0
 
 # 声纹识别 - SpeechBrain
-speechbrain==0.5.15
+speechbrain>=0.5.15
 transformers==4.35.2
 
 # 情绪识别

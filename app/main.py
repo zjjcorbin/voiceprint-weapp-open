@@ -47,14 +47,20 @@ async def lifespan(app: FastAPI):
     try:
         await VoiceprintService.initialize_model()
         logger.info("Voiceprint model initialized successfully")
+    except ImportError as e:
+        logger.error(f"SpeechBrain not properly installed: {e}")
+        logger.warning("Voiceprint recognition will be unavailable")
     except Exception as e:
         logger.error(f"Failed to initialize voiceprint model: {e}")
-        raise
+        logger.warning("System will continue without voiceprint recognition capability")
     
     # 预加载情绪识别模型
     try:
         await EmotionService.initialize_model()
         logger.info("Emotion recognition model initialized successfully")
+    except ImportError as e:
+        logger.error(f"SpeechBrain not properly installed: {e}")
+        logger.warning("Emotion recognition will be unavailable")
     except Exception as e:
         logger.error(f"Failed to initialize emotion model: {e}")
         logger.warning("System will continue without emotion recognition capability")

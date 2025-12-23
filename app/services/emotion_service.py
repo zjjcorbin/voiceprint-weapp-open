@@ -3,7 +3,10 @@ import numpy as np
 import torch
 import torchaudio
 import soundfile as sf
-from speechbrain.inference.classifiers import EncoderClassifier
+try:
+    from speechbrain.inference.classifiers import EncoderClassifier
+except ImportError:
+    from speechbrain.pretrained import EncoderClassifier
 from typing import List, Dict, Tuple, Optional
 import asyncio
 import io
