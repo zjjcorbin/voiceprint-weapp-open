@@ -176,48 +176,52 @@ class EmotionService:
                         
                         # 进行情绪预测 - 改进版本（SpeechBrain 1.0.3 兼容）
                         try:
-                            # 使用 encode_batch 进行推理
-                            signal = self._model.load_audio(temp_file.name)
-                            # 添加批次维度
-                            if signal.dim() == 1:
-                                signal = signal.unsqueeze(0)
-                            # 编码特征
-                            predictions = self._model.encode_batch(signal)
-                            # 分类
-                            out_prob = self._model.mods.classifier(predictions)
-                            score, index = torch.max(out_prob, dim=-1)
-                            emotion_label = self._model.hparams.label_encoder.decode_torch(index)[0]
+                        # 使用 HuggingFace 原生方式进行推理
+                        audio_np = audio_tensor.cpu().numpy()
+                        
+                        # 确保音频数据在合理范围内
+                        if np.max(np.abs(audio_np)) > 0:
+                            audio_np = audio_np / np.max(np.abs(audio_np))
+                        
+                        # 使用 feature_extractor 预处理音频
+                        inputs = self._feature_extractor(
+                            audio_np, 
+                            sampling_rate=sr, 
+                            return_tensors="pt", 
+                            padding=True
+                        )
+                        # 移动输入到正确设备
+                        inputs = {k: v.to(self._device) for k, v in inputs.items()}
+                        
+                        # 推理
+                        with torch.no_grad():
+                            outputs = self._model(**inputs)
+                            probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
+                            score, index = torch.max(probs, dim=-1)
+                            emotion_label = self._model.config.id2label[index.item()]
                             confidence = score.item()
-                            
-                            # 构建概率数组（所有类别的概率）
-                            probs = out_prob.squeeze().cpu().numpy()
-                        except Exception as e:
-                            logger.error(f"Emotion prediction failed: {e}")
-                            raise RuntimeError(f"Emotion prediction failed: {e}")
-                            
-                except Exception as e:
-                    logger.error(f"Emotion prediction failed: {e}")
-                    # 尝试使用原始音频数据进行处理
-                    try:
-                        logger.info("尝试使用备用方法进行情绪识别...")
-                        # 这里可以添加备用的情绪识别方法
-                        raise RuntimeError(f"情绪识别失败，请检查音频格式和模型配置: {e}")
-                    except Exception as fallback_error:
-                        raise RuntimeError(f"情绪识别失败: {fallback_error}")
+                        
+                        # 构建概率数组（所有类别的概率）
+                        probs = probs.squeeze().cpu().numpy()
+                        
+                    except Exception as e:
+                        logger.error(f"Emotion prediction failed: {e}")
+                        raise RuntimeError(f"Emotion prediction failed: {e}")
                 
                 # 转换为numpy
-                probs = probs.cpu().numpy()[0]
+                probs = probs.cpu().numpy()
             
-            # 4. 处理结果
+            # 4. 处理结果 - 使用 HuggingFace 模型的标签映射
+            # 构建完整的情绪概率字典
             emotion_probabilities = {}
             for i, prob in enumerate(probs):
-                if i < len(EMOTION_LABELS):
-                    emotion_label = EMOTION_LABELS[i]
-                    emotion_probabilities[emotion_label] = float(prob)
+                if i < len(self._model.config.id2label):
+                    emotion_name = self._model.config.id2label[i]
+                    emotion_probabilities[emotion_name] = float(prob)
             
-            # 5. 确定主要情绪
-            dominant_emotion = max(emotion_probabilities, key=emotion_probabilities.get)
-            confidence = emotion_probabilities[dominant_emotion]
+            # 主要情绪就是 HuggingFace 预测的 emotion_label
+            dominant_emotion = emotion_label
+            confidence = confidence
             
             # 6. 计算情绪强度和复杂度
             intensity = await self._calculate_emotion_intensity(emotion_probabilities)

@@ -10,6 +10,7 @@ import soundfile as sf
 import os
 import sys
 from loguru import logger
+from app.core.config import settings
 
 def create_test_audio():
     """创建测试音频文件"""
@@ -58,7 +59,7 @@ def test_emotion_recognition():
     """测试情绪识别模型 - 使用 HuggingFace AutoFeatureExtractor + AutoModel"""
     print("测试情绪识别模型...")
     
-    model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+    model_name = settings.EMOTION_MODEL
     
     print(f"  测试模型: {model_name}")
     try:
