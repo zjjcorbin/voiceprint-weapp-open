@@ -55,25 +55,25 @@ def test_speaker_recognition():
         return False
 
 def test_emotion_recognition():
-    """测试情绪识别模型 - 使用 HuggingFace transformers 直接加载"""
+    """测试情绪识别模型 - 使用 HuggingFace AutoFeatureExtractor + AutoModel"""
     print("测试情绪识别模型...")
     
     model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
     
     print(f"  测试模型: {model_name}")
     try:
-        from transformers import Wav2Vec2ForSequenceClassification, Wav2Vec2Processor
+        from transformers import AutoFeatureExtractor, AutoModelForSequenceClassification
         import torch
         
-        # 加载 processor 和模型
-        processor = Wav2Vec2Processor.from_pretrained(model_name)
-        model = Wav2Vec2ForSequenceClassification.from_pretrained(model_name)
+        # 加载特征提取器和模型
+        feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name)
         
         # 创建测试音频
         audio, sr = create_test_audio()
         
-        # 预处理音频
-        inputs = processor(audio, sampling_rate=sr, return_tensors="pt", padding=True)
+        # 预处理音频（使用 feature_extractor）
+        inputs = feature_extractor(audio, sampling_rate=sr, return_tensors="pt", padding=True)
         
         # 推理
         with torch.no_grad():
