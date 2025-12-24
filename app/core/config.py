@@ -1,24 +1,40 @@
 import os
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    try:
+        from pydantic import BaseSettings
+    except ImportError as e:
+        raise ImportError("需要安装 pydantic-settings: pip install pydantic-settings") from e
+
 from typing import Optional, List
+
+try:
+    from pydantic import field_validator
+except ImportError:
+    try:
+        from pydantic import validator as field_validator
+    except ImportError:
+        # 如果都没有，定义一个空的装饰器
+        def field_validator(field_name, mode='before'):
+            def decorator(func):
+                return func
+            return decorator
 
 
 class Settings(BaseSettings):
     """应用配置"""
     
-    from pydantic import field_validator
-    
-    @field_validator('SUPPORTED_EMOTIONS', mode='before')
-    @classmethod
-    def parse_supported_emotions(cls, v):
-        """验证并转换SUPPORTED_EMOTIONS字段值"""
-        if isinstance(v, str):
-            # 如果是字符串，按逗号分割
-            return [emotion.strip() for emotion in v.split(",") if emotion.strip()]
-        elif isinstance(v, list):
-            return v
+    @property
+    def SUPPORTED_EMOTIONS_LIST(self) -> List[str]:
+        """获取支持的情绪列表（处理字符串和列表两种格式）"""
+        raw_value = getattr(self, 'SUPPORTED_EMOTIONS', [])
+        if isinstance(raw_value, str):
+            return [emotion.strip() for emotion in raw_value.split(",") if emotion.strip()]
+        elif isinstance(raw_value, list):
+            return raw_value
         else:
-            raise ValueError("SUPPORTED_EMOTIONS must be a string or list")
+            return ["neutral", "happy", "sad", "angry", "fear", "disgust", "surprise"]
     
     # 应用基础配置
     APP_NAME: str = "声纹识别系统"
@@ -49,7 +65,7 @@ class Settings(BaseSettings):
     # 情绪识别配置
     EMOTION_MODEL: str = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
     EMOTION_CONFIDENCE_THRESHOLD: float = 0.6
-    SUPPORTED_EMOTIONS: list[str] = ["neutral", "happy", "sad", "angry", "fear", "disgust", "surprise"]
+    SUPPORTED_EMOTIONS: str = "neutral,happy,sad,angry,fear,disgust,surprise"
     EMOTION_ANALYSIS_ENABLED: bool = True
     
     # 微信配置

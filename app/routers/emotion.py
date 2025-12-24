@@ -426,10 +426,7 @@ async def get_emotion_model_status():
         return {
             "model_loaded": model_status,
             "service_status": "online" if model_status else "offline",
-            "supported_emotions": [
-                "neutral", "happy", "sad", "angry", 
-                "fear", "disgust", "surprise"
-            ],
+            "supported_emotions": settings.SUPPORTED_EMOTIONS_LIST,
             "max_file_size": "50MB",
             "supported_formats": ["audio/wav", "audio/mp3", "audio/m4a", "audio/ogg"]
         }
