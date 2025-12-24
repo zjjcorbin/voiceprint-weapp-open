@@ -141,6 +141,14 @@ def verify_audio_stack():
     except Exception as e:
         print(f"⚠ torch.load安全检查失败: {e}")
     
+    # 检查NumPy版本兼容性
+    import numpy
+    print(f"✓ NumPy版本: {numpy.__version__}")
+    if numpy.__version__.startswith('2.'):
+        print("⚠ 警告: NumPy 2.x可能导致兼容性问题，建议降级到numpy<2.0.0")
+    else:
+        print("✓ NumPy版本兼容性检查通过")
+    
     # 检查torchaudio版本
     print(f"✓ TorchAudio版本: {torchaudio.__version__}")
     

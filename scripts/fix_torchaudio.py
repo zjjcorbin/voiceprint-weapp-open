@@ -26,6 +26,7 @@ def fix_speechbrain_103_compatibility():
     print("升级到SpeechBrain 1.0.3安全修复版本...")
     
     packages = [
+        ("numpy<2.0.0", "NumPy 1.x 兼容版本"),
         ("torch==2.2.1", "PyTorch 2.2.1 (安全修复版)"),
         ("torchvision==0.17.1", "TorchVision 0.17.1 (安全修复版)"), 
         ("torchaudio==2.2.1", "TorchAudio 2.2.1 (安全修复版)"),

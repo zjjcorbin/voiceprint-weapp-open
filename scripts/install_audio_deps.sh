@@ -23,6 +23,9 @@ pip install speechbrain==1.0.3
 echo "5. 安装兼容的transformers版本..."
 pip install transformers==4.36.2
 
+echo "6. 安装NumPy兼容版本..."
+pip install "numpy<2.0.0"
+
 echo "5. 安装其他音频依赖..."
 pip install --upgrade librosa soundfile scipy
 
@@ -31,9 +34,16 @@ python -c "
 import torch
 import torchaudio
 import speechbrain
+import numpy
 print(f'✓ PyTorch版本: {torch.__version__}')
 print(f'✓ TorchAudio版本: {torchaudio.__version__}')
 print(f'✓ SpeechBrain版本: {speechbrain.__version__}')
+print(f'✓ NumPy版本: {numpy.__version__}')
+
+# 检查NumPy兼容性
+import warnings
+if numpy.__version__.startswith('2.'):
+    warnings.warn('NumPy 2.x可能存在兼容性问题，建议使用numpy<2.0.0')
 
 # 导入兼容性工具进行验证
 from app.utils.audio_compat import verify_audio_stack
