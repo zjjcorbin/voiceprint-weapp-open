@@ -287,7 +287,11 @@ async def test_emotion_detection(audio_file: UploadFile = File(...)):
                 )
         
         # 读取音频数据
+        # 读取音频数据并添加调试信息
         audio_data = await audio_file.read()
+        logger.info(f"读取的音频数据大小: {len(audio_data)} bytes")
+        logger.info(f"文件名: {audio_file.filename}")
+        logger.info(f"文件类型: {audio_file.content_type}")
         
         if len(audio_data) == 0:
             return JSONResponse(
