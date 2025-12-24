@@ -58,15 +58,17 @@ class EmotionService:
             cls._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             logger.info(f"Using device: {cls._device}")
             
-            # 固定使用emotion-recognition-wav2vec2-IEMOCAP模型
-            model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+            # 使用配置文件中的情绪识别模型
+            model_name = settings.EMOTION_MODEL
+            save_dir = f"pretrained_models/emotion_recognition_{model_name.split('/')[-1]}"
             cls._model = EncoderClassifier.from_hparams(
                 source=model_name,
-                savedir="pretrained_models/emotion_recognition_wav2vec2",
+                savedir=save_dir,
                 run_opts={"device": str(cls._device)}
             )
             
             logger.info(f"Emotion recognition model loaded: {model_name}")
+            logger.info(f"Model saved to: {save_dir}")
             return True
             
         except Exception as e:
@@ -152,7 +154,7 @@ class EmotionService:
                 analysis=emotion_analysis,
                 audio_url=audio_url,
                 audio_duration=len(audio_tensor) / sr,
-                model_name="speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+                model_name=settings.EMOTION_MODEL
                 processing_time=0  # 实际应该计算处理时间
             )
             

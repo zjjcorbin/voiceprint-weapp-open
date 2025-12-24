@@ -27,8 +27,10 @@ def download_models():
         print("声纹识别模型下载完成")
         
         print("下载情绪识别模型...")
-        # 只下载指定的情绪识别模型
-        emotion_model = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+        # 使用配置文件中指定的情绪识别模型
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from app.core.config import settings
+        emotion_model = settings.EMOTION_MODEL
         
         try:
             emo_model = EncoderClassifier.from_hparams(
@@ -44,7 +46,7 @@ def download_models():
         print("模型下载完成！")
         print("已下载模型:")
         print("  - 声纹识别: speechbrain/spkrec-ecapa-voxceleb")
-        print("  - 情绪识别: speechbrain/emotion-recognition-wav2vec2-IEMOCAP")
+        print(f"  - 情绪识别: {emotion_model}")
         return True
         
     except ImportError as e:

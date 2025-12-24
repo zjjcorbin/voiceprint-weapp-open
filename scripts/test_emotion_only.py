@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-精简模型测试脚本 - 只测试指定的情绪识别模型
+精简模型测试脚本 - 测试配置文件中的情绪识别模型
 """
 
 import torch
@@ -10,6 +10,11 @@ import soundfile as sf
 import os
 import sys
 from loguru import logger
+
+# 添加项目根目录到Python路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+from app.core.config import settings
 
 def create_test_audio():
     """创建测试音频文件"""
@@ -24,11 +29,11 @@ def create_test_audio():
     return audio, sample_rate
 
 def test_emotion_recognition_only():
-    """只测试emotion-recognition-wav2vec2-IEMOCAP模型"""
+    """测试配置文件中指定的情绪识别模型"""
     print("测试情绪识别模型...")
     
-    model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
-    save_dir = "emotion_recognition_wav2vec2"
+    model_name = settings.EMOTION_MODEL
+    save_dir = f"emotion_recognition_{model_name.split('/')[-1]}"
     
     try:
         try:
@@ -91,7 +96,7 @@ def main():
     """主函数"""
     print("=" * 50)
     print("精简情绪识别模型测试")
-    print("只测试: emotion-recognition-wav2vec2-IEMOCAP")
+    print(f"测试模型: {model_name}")
     print("=" * 50)
     
     success = test_emotion_recognition_only()

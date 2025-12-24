@@ -66,6 +66,14 @@ except Exception as e:
 try:
     from speechbrain.inference.classifiers import EncoderClassifier
     print('✓ SpeechBrain导入成功')
+    
+    # 读取配置文件中的模型
+    if [ -f '/app/app/core/config.py' ]; then
+        python -c "
+from app.core.config import settings
+print(f'配置的情绪识别模型: {settings.EMOTION_MODEL}')
+"
+    fi
 except Exception as e:
     print(f'⚠ SpeechBrain兼容性检查: {e}')
 "
@@ -75,7 +83,7 @@ if python -c "
 try:
     from speechbrain.inference.classifiers import EncoderClassifier
     model = EncoderClassifier.from_hparams(
-        source='speechbrain/emotion-recognition-wav2vec2-IEMOCAP',
+        source=\"$EMOTION_MODEL\",
         savedir='pretrained_models/emotion_recognition_wav2vec2',
         run_opts={'device': 'cpu'}
     )
