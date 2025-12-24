@@ -68,7 +68,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - HF_ENDPOINT=https://hf-mirror.com
+        HF_ENDPOINT: https://hf-mirror.com
     container_name: voiceprint-api
     environment:
       # 基础配置
