@@ -19,17 +19,17 @@ librosa>=0.10.0
 soundfile>=0.12.1
 scipy>=1.11.0
 numpy<2.0.0
-torchaudio==2.2.1
+torchaudio==2.6.0
 torchaudio-augmentations>=0.2.0
 
 # 声纹识别 - SpeechBrain
 speechbrain==1.0.3
-transformers>=4.36.0
+transformers>=4.46.0
 # 注意：huggingface-transformers 不是正确的包名，应该使用 transformers
 
 # 情绪识别
-torch==2.2.1
-torchvision==0.17.1
+torch==2.6.0
+torchvision==0.21.0
 huggingface-hub>=0.15.0
 sentencepiece>=0.1.97
 

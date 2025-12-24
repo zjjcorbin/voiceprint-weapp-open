@@ -44,3 +44,6 @@ except Exception as e:
 
 echo "NumPy兼容性修复完成！"
 echo "已安装NumPy < 2.0.0版本，与PyTorch生态系统完全兼容"
+echo ""
+echo "注意：如果仍有torch.load安全警告，请升级到PyTorch 2.6.0+"
+echo "使用: pip install torch==2.6.0 torchaudio==2.6.0 torchvision==0.21.0"

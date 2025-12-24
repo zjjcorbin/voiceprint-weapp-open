@@ -11,17 +11,17 @@ echo "开始修复音频依赖兼容性问题..."
 echo "1. 卸载现有音频相关包..."
 pip uninstall -y torchaudio speechbrain torch
 
-echo "2. 安装SpeechBrain 1.0.3兼容的PyTorch版本（安全修复版）..."
-pip install torch==2.2.1 torchvision==0.17.1 --index-url https://download.pytorch.org/whl/cu118
+echo "2. 安装PyTorch 2.6.0安全修复版本..."
+pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu118
 
-echo "3. 安装兼容的torchaudio版本（安全修复版）..."
-pip install torchaudio==2.2.1 --index-url https://download.pytorch.org/whl/cu118
+echo "3. 安装PyTorch 2.6.0兼容的torchaudio版本..."
+pip install torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu118
 
 echo "4. 安装SpeechBrain 1.0.3最新版本..."
 pip install speechbrain==1.0.3
 
-echo "5. 安装兼容的transformers版本..."
-pip install transformers==4.36.2
+echo "5. 安装Transformers 4.46.0版本（消除警告）..."
+pip install transformers==4.46.0
 
 echo "6. 安装NumPy兼容版本..."
 pip install "numpy<2.0.0"

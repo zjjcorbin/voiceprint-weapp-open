@@ -22,16 +22,16 @@ def fix_speechbrain_103_compatibility():
         print(f"库未安装: {e}")
         return False
     
-    # 升级到SpeechBrain 1.0.3安全修复版本
-    print("升级到SpeechBrain 1.0.3安全修复版本...")
+    # 升级到PyTorch 2.6.0安全修复版本
+    print("升级到PyTorch 2.6.0安全修复版本...")
     
     packages = [
         ("numpy<2.0.0", "NumPy 1.x 兼容版本"),
-        ("torch==2.2.1", "PyTorch 2.2.1 (安全修复版)"),
-        ("torchvision==0.17.1", "TorchVision 0.17.1 (安全修复版)"), 
-        ("torchaudio==2.2.1", "TorchAudio 2.2.1 (安全修复版)"),
+        ("torch==2.6.0", "PyTorch 2.6.0 (CVE-2025-32434安全修复)"),
+        ("torchvision==0.21.0", "TorchVision 0.21.0 (PyTorch 2.6兼容版)"), 
+        ("torchaudio==2.6.0", "TorchAudio 2.6.0 (PyTorch 2.6兼容版)"),
         ("speechbrain==1.0.3", "SpeechBrain 1.0.3"),
-        ("transformers==4.36.2", "Transformers 4.36.2")
+        ("transformers==4.46.0", "Transformers 4.46.0 (消除警告)")
     ]
     
     for package, name in packages:
