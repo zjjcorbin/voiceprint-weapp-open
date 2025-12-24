@@ -242,6 +242,9 @@ async def test_emotion_detection(audio_file: UploadFile = File(...)):
     from app.services.emotion_service import EmotionService
     import time
     
+    logger.info(f"收到情绪识别测试请求，文件名: {audio_file.filename}")
+    logger.info(f"文件类型: {audio_file.content_type}")
+    
     try:
         # 检查模型状态
         emotion_service = EmotionService()
