@@ -85,6 +85,10 @@ class Settings(BaseSettings):
     # Redis配置 (可选)
     REDIS_URL: Optional[str] = None
     
+    # 日志配置
+    LOG_LEVEL: str = "INFO"
+    LOG_FILE: str = "logs/app.log"
+    
     @property
     def minio_url(self) -> str:
         """获取MinIO访问URL"""
@@ -94,6 +98,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "allow"  # 允许额外的字段
 
 
 # 创建全局设置实例
