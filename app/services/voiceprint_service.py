@@ -394,6 +394,21 @@ class VoiceprintService:
             timestamp = int(time.time())
             object_name = f"audio/{timestamp}_{filename}"
             
+            # === 调试日志开始 ===
+            logger.info(f"[DEBUG] MINIO_ENDPOINT={settings.MINIO_ENDPOINT}")
+            logger.info(f"[DEBUG] MINIO_BUCKET={settings.MINIO_BUCKET}")
+            logger.info(f"[DEBUG] MINIO_SECURE={settings.MINIO_SECURE}")
+            logger.info(f"[DEBUG] computed minio_url={settings.minio_url}")
+            # === 调试日志结束 ===
+            
+            # 检查关键配置项是否为 None
+            if settings.minio_url is None:
+                logger.error("[ERROR] settings.minio_url is None")
+                raise ValueError("MinIO URL is not configured")
+            if settings.MINIO_BUCKET is None:
+                logger.error("[ERROR] settings.MINIO_BUCKET is None")
+                raise ValueError("MinIO Bucket is not configured")
+            
             minio_client.put_object(
                 bucket_name=settings.MINIO_BUCKET,
                 object_name=object_name,
@@ -403,6 +418,12 @@ class VoiceprintService:
             )
             
             audio_url = f"{settings.minio_url}/{settings.MINIO_BUCKET}/{object_name}"
+            # 确保 audio_url 不是 None
+            if audio_url is None:
+                logger.error("[ERROR] Generated audio_url is None")
+                raise ValueError("Generated audio_url is None")
+                
+            logger.info(f"[DEBUG] Generated audio_url={audio_url}")
             return audio_url
             
         except Exception as e:
