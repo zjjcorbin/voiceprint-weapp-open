@@ -430,6 +430,65 @@ async def debug_upload(audio_file: UploadFile = File(...)):
         "message": "文件上传调试完成",
         "file_info": file_info
     }
+# 简单情绪识别端点（绕过复杂处理）
+@app.post("/simple/emotion", tags=["测试"])
+async def simple_emotion_detection(audio_file: UploadFile = File(...)):
+    """简单情绪识别 - 直接处理原始音频"""
+    from app.services.emotion_service import EmotionService
+    import time
+    
+    logger.info(f"简单情绪识别请求 - 文件名: {audio_file.filename}")
+    
+    try:
+        # 读取音频数据
+        audio_data = await audio_file.read()
+        logger.info(f"音频数据大小: {len(audio_data)} bytes")
+        
+        if len(audio_data) == 0:
+            return {"error": "音频文件为空"}
+        
+        # 检查模型状态
+        emotion_service = EmotionService()
+        model_status = await emotion_service.check_model_status()
+        
+        if not model_status:
+            return {
+                "success": False,
+                "message": "情绪识别服务未就绪",
+                "error_code": "SERVICE_UNAVAILABLE"
+            }
+        
+        start_time = time.time()
+        
+        # 直接调用检测方法
+        result = await emotion_service.detect_emotion(audio_data)
+        
+        processing_time = time.time() - start_time
+        
+        return {
+            "success": True,
+            "message": "情绪检测完成",
+            "filename": audio_file.filename,
+            "processing_time": round(processing_time, 3),
+            "result": {
+                "dominant_emotion": result.dominant_emotion,
+                "confidence": result.confidence,
+                "intensity": result.intensity,
+                "complexity": result.complexity,
+                "quality_score": result.quality_score,
+                "audio_duration": result.audio_duration,
+                "emotion_probabilities": result.emotion_probabilities,
+                "analysis": result.analysis
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Simple emotion detection failed: {e}")
+        return {
+            "success": False,
+            "message": f"情绪检测失败: {str(e)}",
+            "error_code": "INTERNAL_ERROR"
+        }
 
 
 # 注册路由

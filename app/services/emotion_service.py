@@ -257,14 +257,45 @@ class EmotionService:
                 temp_file_path = temp_file.name
             
             try:
-                # 加载音频 - 情绪识别模型通常需要16kHz采样率
-                audio, sr = librosa.load(temp_file_path, sr=16000, mono=True)
+                # 尝试多种方式加载音频
+                try:
+                    # 方法1: 直接使用librosa加载
+                    audio, sr = librosa.load(temp_file_path, sr=16000, mono=True)
+                except Exception as e:
+                    logger.warning(f"Librosa加载失败，尝试备用方法: {e}")
+                    
+                    # 方法2: 使用soundfile加载
+                    import soundfile as sf
+                    audio, sr = sf.read(temp_file_path)
+                    
+                    # 转换为单声道
+                    if len(audio.shape) > 1:
+                        audio = np.mean(audio, axis=1)
+                    
+                    # 重采样到16kHz
+                    if sr != 16000:
+                        from scipy import signal
+                        num_samples = int(len(audio) * 16000 / sr)
+                        audio = signal.resample(audio, num_samples)
+                        sr = 16000
+                
+                # 确保音频长度合适（至少1秒）
+                if len(audio) < sr:  # 少于1秒
+                    # 填充到至少1秒
+                    target_length = max(len(audio), sr)
+                    padded_audio = np.zeros(target_length)
+                    padded_audio[:len(audio)] = audio
+                    audio = padded_audio
+                
+                logger.info(f"音频加载成功: 时长={len(audio)/sr:.2f}s, 采样率={sr}")
                 
                 # 音频增强
                 audio = self._enhance_audio(audio)
                 
                 # 转换为tensor
                 audio_tensor = torch.from_numpy(audio).float()
+                
+                logger.info(f"音频预处理完成: 时长={len(audio)/sr:.2f}s, 采样率={sr}")
                 
                 return audio_tensor, sr
                 
