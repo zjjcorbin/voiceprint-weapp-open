@@ -90,11 +90,28 @@ class EmotionService:
                 cls._model = None
                 return False
 
-            cls._model = EncoderClassifier.from_hparams(
-                source=model_name,
-                savedir=save_dir,
-                run_opts={"device": str(cls._device)}
-            )
+            # 尝试不同的模型加载方式
+            try:
+                # 方法1: 使用标准的from_hparams
+                cls._model = EncoderClassifier.from_hparams(
+                    source=model_name,
+                    savedir=save_dir,
+                    run_opts={"device": str(cls._device)}
+                )
+            except Exception as e:
+                logger.warning(f"Standard model loading failed, trying alternative: {e}")
+                
+                # 方法2: 尝试直接加载预训练模型
+                try:
+                    from speechbrain.pretrained import EncoderClassifier as PretrainedEncoderClassifier
+                    cls._model = PretrainedEncoderClassifier.from_hparams(
+                        source=model_name,
+                        savedir=save_dir,
+                        run_opts={"device": str(cls._device)}
+                    )
+                except Exception as e2:
+                    logger.error(f"Alternative model loading also failed: {e2}")
+                    raise
             
             logger.info(f"Emotion recognition model loaded: {model_name}")
             logger.info(f"Model saved to: {save_dir}")
