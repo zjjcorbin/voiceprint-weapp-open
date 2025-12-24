@@ -153,6 +153,19 @@ download_models() {
     log_info "模型下载完成"
 }
 
+# 构建Docker镜像
+build_docker() {
+    log_info "构建Docker镜像（包含预训练模型）..."
+    
+    # 设置构建时环境变量
+    export DOCKER_BUILDKIT=1
+    
+    # 构建应用镜像，这会在构建过程中下载模型
+    docker-compose build --no-cache app
+    
+    log_info "Docker镜像构建完成（包含预训练模型）"
+}
+
 # 启动服务
 start_services() {
     log_info "启动系统服务..."
@@ -226,11 +239,10 @@ main() {
             check_dependencies
             create_directories
             setup_config
-    install_dependencies
-    download_models
-    init_database
-    init_minio
-    start_services
+            build_docker
+            init_database
+            init_minio
+            start_services
             show_status
             ;;
         start)

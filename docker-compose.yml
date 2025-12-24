@@ -67,14 +67,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - HF_ENDPOINT=https://hf-mirror.com
     container_name: voiceprint-api
     environment:
+      # 基础配置
       - DATABASE_URL=mysql+asyncmy://voiceprint:password123@mysql:3306/voiceprint_system
       - MINIO_ENDPOINT=minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=voiceprint-audio
       - REDIS_URL=redis://redis:6379/0
+      
+      # Docker特定配置
+      - DOCKER_ENV=true
+      - PRELOAD_MODELS=true
+      - SKIP_AUDIO_CHECK=true
+      - USE_HF_MIRROR=false  # 镜像中不需要，模型已内置
     ports:
       - "8000:8000"
     volumes:

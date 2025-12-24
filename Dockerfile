@@ -30,16 +30,25 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
     && pip install --no-cache-dir --upgrade librosa soundfile scipy
 
+# 设置Hugging Face镜像（构建阶段）
+ENV HF_ENDPOINT=https://hf-mirror.com
+ENV TRANSFORMERS_CACHE=/app/pretrained_models/cache
+
 # 复制应用代码
 COPY app/ ./app/
 COPY scripts/ ./scripts/
+COPY .env.example .env
 
 # 创建必要的目录
 RUN mkdir -p logs uploads temp pretrained_models
 
+# 下载预训练模型
+RUN python scripts/download_models.py
+
 # 设置环境变量
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
+ENV USE_HF_MIRROR=false  # 镜像中不需要镜像，模型已内置
 
 # 暴露端口
 EXPOSE 8000

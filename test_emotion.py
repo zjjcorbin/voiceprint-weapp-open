@@ -24,7 +24,7 @@ def test_emotion_detection(audio_file_path):
     
     try:
         # 发送请求
-        url = "http://localhost:8000/test/emotion"
+        url = "http://127.0.0.1:8000/test/emotion"
         files = {"audio_file": open(audio_file_path, "rb")}
         
         print(f"正在测试情绪识别...")
