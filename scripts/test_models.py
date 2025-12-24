@@ -55,38 +55,34 @@ def test_speaker_recognition():
         return False
 
 def test_emotion_recognition():
-    """测试情绪识别模型 - 只测试emotion-recognition-wav2vec2-IEMOCAP"""
+    """测试情绪识别模型 - 使用 HuggingFace transformers 直接加载"""
     print("测试情绪识别模型...")
     
-    # 只测试指定的模型
     model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
-    save_dir = "emotion_recognition_wav2vec2"
     
     print(f"  测试模型: {model_name}")
     try:
-        try:
-            from speechbrain.inference.classifiers import EncoderClassifier
-        except ImportError:
-            from speechbrain.pretrained import EncoderClassifier
+        from transformers import Wav2Vec2ForSequenceClassification, Wav2Vec2Processor
+        import torch
         
-        # 加载模型
-        model = EncoderClassifier.from_hparams(
-            source=model_name,
-            savedir=f"pretrained_models/{save_dir}"
-        )
+        # 加载 processor 和模型
+        processor = Wav2Vec2Processor.from_pretrained(model_name)
+        model = Wav2Vec2ForSequenceClassification.from_pretrained(model_name)
         
         # 创建测试音频
         audio, sr = create_test_audio()
         
-        # 情绪识别 - 使用 encode_batch 兼容方式
+        # 预处理音频
+        inputs = processor(audio, sampling_rate=sr, return_tensors="pt", padding=True)
+        
+        # 推理
         with torch.no_grad():
-            signal = torch.tensor(audio).unsqueeze(0)
-            predictions = model.encode_batch(signal)
-            out_prob = model.mods.classifier(predictions)
-            score, index = torch.max(out_prob, dim=-1)
-            emotion_label = model.hparams.label_encoder.decode_torch(index)[0]
+            outputs = model(**inputs)
+            probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
+            score, index = torch.max(probs, dim=-1)
+            emotion_label = model.config.id2label[index.item()]
             confidence = score.item()
-            
+        
         print(f"  ✓ 情绪识别模型 {model_name} 加载成功")
         print(f"    预测情绪: {emotion_label}, 置信度: {confidence:.4f}")
         return True
