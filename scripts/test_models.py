@@ -78,12 +78,17 @@ def test_emotion_recognition():
         # 创建测试音频
         audio, sr = create_test_audio()
         
-        # 情绪识别
+        # 情绪识别 - 使用 encode_batch 兼容方式
         with torch.no_grad():
-            prediction = model.classify_batch(torch.tensor(audio).unsqueeze(0))
+            signal = torch.tensor(audio).unsqueeze(0)
+            predictions = model.encode_batch(signal)
+            out_prob = model.mods.classifier(predictions)
+            score, index = torch.max(out_prob, dim=-1)
+            emotion_label = model.hparams.label_encoder.decode_torch(index)[0]
+            confidence = score.item()
             
         print(f"  ✓ 情绪识别模型 {model_name} 加载成功")
-        print(f"    预测结果: {prediction}")
+        print(f"    预测情绪: {emotion_label}, 置信度: {confidence:.4f}")
         return True
         
     except Exception as e:
