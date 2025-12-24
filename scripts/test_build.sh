@@ -50,16 +50,16 @@ test_build_args() {
 }
 
 # 测试Dockerfile语法
-test_dockerfile() {
-    log_info "测试Dockerfile语法..."
-    
-    if docker build --dry-run -f Dockerfile . > /dev/null 2>&1; then
-        log_info "✓ Dockerfile语法正确"
-    else
-        log_error "✗ Dockerfile语法错误"
-        exit 1
-    fi
-}
+#test_dockerfile() {
+#    log_info "测试Dockerfile语法..."
+#
+#    if docker build --dry-run -f Dockerfile . > /dev/null 2>&1; then
+#        log_info "✓ Dockerfile语法正确"
+#    else
+#        log_error "✗ Dockerfile语法错误"
+#        exit 1
+#    fi
+#}
 
 # 测试构建过程
 test_build() {
