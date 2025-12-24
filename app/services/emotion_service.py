@@ -139,16 +139,53 @@ class EmotionService:
                 if audio_tensor.dim() == 1:
                     audio_tensor = audio_tensor.unsqueeze(0)
                 
-                # 进行情绪预测
-                prediction = self._model.classify_batch(audio_tensor)
-                
-                # 获取概率分布
-                if hasattr(prediction, 'logits'):
-                    probs = torch.softmax(prediction.logits, dim=-1)
-                elif isinstance(prediction, tuple):
-                    probs = torch.softmax(prediction[0], dim=-1)
-                else:
-                    probs = torch.softmax(prediction, dim=-1)
+                # 进行情绪预测 - 使用正确的SpeechBrain接口
+                try:
+                    # 方法1: 尝试使用classify_file风格的接口
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+                        # 保存音频到临时文件
+                        sf.write(temp_file.name, audio_tensor.cpu().numpy(), sr)
+                        
+                        # 使用classify_file方法
+                        prediction = self._model.classify_file(temp_file.name)
+                        
+                        # 清理临时文件
+                        os.unlink(temp_file.name)
+                        
+                        # 提取概率
+                        if hasattr(prediction, 'probs'):
+                            probs = prediction.probs[0]
+                        elif hasattr(prediction, 'logits'):
+                            probs = torch.softmax(prediction.logits[0], dim=-1)
+                        else:
+                            # 如果以上都不行，尝试直接访问概率
+                            probs = prediction[0] if isinstance(prediction, (list, tuple)) else prediction
+                            
+                except Exception as file_error:
+                    logger.warning(f"Classify file failed, trying classify_batch: {file_error}")
+                    
+                    # 方法2: 回退到classify_batch
+                    try:
+                        # 确保音频格式正确
+                        if audio_tensor.dim() == 1:
+                            audio_tensor = audio_tensor.unsqueeze(0)
+                        
+                        # 添加通道维度（如果需要）
+                        if audio_tensor.dim() == 2:
+                            audio_tensor = audio_tensor.unsqueeze(1)
+                        
+                        prediction = self._model.classify_batch(audio_tensor)
+                        
+                        if hasattr(prediction, 'probs'):
+                            probs = prediction.probs[0]
+                        elif hasattr(prediction, 'logits'):
+                            probs = torch.softmax(prediction.logits[0], dim=-1)
+                        else:
+                            probs = prediction[0] if isinstance(prediction, (list, tuple)) else prediction
+                            
+                    except Exception as batch_error:
+                        logger.error(f"Both classify methods failed: {batch_error}")
+                        raise RuntimeError(f"情绪识别失败: {batch_error}")
                 
                 # 转换为numpy
                 probs = probs.cpu().numpy()[0]
