@@ -54,6 +54,11 @@ class EmotionService:
     async def initialize_model(cls):
         """初始化情绪识别模型 - 只使用emotion-recognition-wav2vec2-IEMOCAP"""
         try:
+            # 设置Hugging Face镜像（如果在中国大陆）
+            if os.getenv("USE_HF_MIRROR", "false").lower() == "true":
+                os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+                logger.info("Using Hugging Face mirror: https://hf-mirror.com")
+            
             # 检测设备
             cls._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             logger.info(f"Using device: {cls._device}")
@@ -61,6 +66,19 @@ class EmotionService:
             # 使用配置文件中的情绪识别模型
             model_name = settings.EMOTION_MODEL
             save_dir = f"pretrained_models/emotion_recognition_{model_name.split('/')[-1]}"
+            
+            # 尝试导入不同版本的SpeechBrain
+            try:
+                from speechbrain.inference.classifiers import EncoderClassifier
+            except ImportError:
+                try:
+                    from speechbrain.pretrained import EncoderClassifier
+                except ImportError as e:
+                    logger.error(f"SpeechBrain import failed: {e}")
+                    logger.warning("请安装SpeechBrain: pip install speechbrain")
+                    cls._model = None
+                    return False
+            
             cls._model = EncoderClassifier.from_hparams(
                 source=model_name,
                 savedir=save_dir,
@@ -71,9 +89,16 @@ class EmotionService:
             logger.info(f"Model saved to: {save_dir}")
             return True
             
+        except ImportError as e:
+            logger.error(f"SpeechBrain not properly installed for emotion recognition: {e}")
+            logger.warning("Emotion recognition will be unavailable")
+            cls._model = None
+            return False
         except Exception as e:
             logger.error(f"Failed to initialize emotion model {model_name}: {e}")
-            raise RuntimeError(f"Failed to load emotion model: {model_name}")
+            logger.warning("Emotion recognition will be unavailable - run download script to get models")
+            cls._model = None
+            return False
     
     async def check_model_status(self) -> bool:
         """检查模型状态"""
