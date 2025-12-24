@@ -5,6 +5,8 @@ from datetime import datetime
 
 class VoiceprintFeature(BaseModel):
     """声纹特征模型"""
+    model_config = {'protected_namespaces': ()}
+    
     embedding: List[float] = Field(..., description="声纹嵌入向量")
     model_name: str = Field(..., description="使用的模型名称")
     sample_rate: int = Field(default=16000, description="音频采样率")

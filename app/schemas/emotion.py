@@ -14,6 +14,8 @@ class EmotionResult(BaseModel):
 
 class EmotionFeature(BaseModel):
     """情绪特征"""
+    model_config = {'protected_namespaces': ()}
+    
     dominant_emotion: str = Field(..., description="主要情绪")
     confidence: float = Field(..., ge=0.0, le=1.0, description="置信度")
     emotion_probabilities: Dict[str, float] = Field(..., description="各情绪概率分布")
