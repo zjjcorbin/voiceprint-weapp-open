@@ -156,7 +156,7 @@ class EmotionService:
                 if audio_tensor.dim() == 1:
                     audio_tensor = audio_tensor.unsqueeze(0)
                 
-                # 进行情绪预测 - 改进版本
+                # 进行情绪预测 - 使用SpeechBrain标准接口
                 try:
                     # 保存音频到临时文件并使用classify_file
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
@@ -174,49 +174,55 @@ class EmotionService:
                         if not os.path.exists(temp_file.name) or os.path.getsize(temp_file.name) == 0:
                             raise RuntimeError("临时WAV文件创建失败")
                         
-                        # 进行情绪预测 - 使用 HuggingFace 原生方式
-                        try:
-                            # 使用 HuggingFace 原生方式进行推理
-                            audio_np = audio_tensor.cpu().numpy()
+                        # 使用SpeechBrain的classify_file方法
+                        prediction = self._model.classify_file(temp_file.name)
+                        
+                        # 清理临时文件
+                        os.unlink(temp_file.name)
+                        
+                        # 提取概率 - SpeechBrain通常返回包含probs的对象
+                        if hasattr(prediction, 'probs'):
+                            probs = prediction.probs.squeeze().cpu().numpy()
+                        elif hasattr(prediction, 'logits'):
+                            probs = torch.softmax(prediction.logits.squeeze(), dim=-1).cpu().numpy()
+                        else:
+                            # 如果以上都不行，尝试直接访问
+                            probs = prediction.squeeze().cpu().numpy() if hasattr(prediction, 'squeeze') else np.array(prediction)
+                        
+                        # 获取主要情绪和置信度
+                        dominant_index = np.argmax(probs)
+                        confidence = float(probs[dominant_index])
+                        
+                        # 映射到情绪标签
+                        if hasattr(self._model, 'label_encoder'):
+                            # 如果有标签编码器，使用它
+                            emotion_label = self._model.label_encoder.ind2lab[dominant_index]
+                        else:
+                            # 否则使用默认映射
+                            emotion_label = EMOTION_LABELS.get(dominant_index, f"emotion_{dominant_index}")
                             
-                            # 确保音频数据在合理范围内
-                            if np.max(np.abs(audio_np)) > 0:
-                                audio_np = audio_np / np.max(np.abs(audio_np))
-                            
-                            # 使用 feature_extractor 预处理音频
-                            inputs = self._feature_extractor(
-                                audio_np, 
-                                sampling_rate=sr, 
-                                return_tensors="pt", 
-                                padding=True
-                            )
-                        # 移动输入到正确设备
-                        inputs = {k: v.to(self._device) for k, v in inputs.items()}
-                        
-                        # 推理
-                        with torch.no_grad():
-                            outputs = self._model(**inputs)
-                            probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
-                            score, index = torch.max(probs, dim=-1)
-                            emotion_label = self._model.config.id2label[index.item()]
-                            confidence = score.item()
-                        
-                        # 构建概率数组（所有类别的概率）
-                        probs = probs.squeeze().cpu().numpy()
-                        
-                    except Exception as e:
-                        logger.error(f"Emotion prediction failed: {e}")
-                        raise RuntimeError(f"Emotion prediction failed: {e}")
-                
-                # 转换为numpy
-                probs = probs.cpu().numpy()
+                except Exception as e:
+                    logger.error(f"Emotion prediction failed: {e}")
+                    raise RuntimeError(f"情绪识别失败: {e}")
             
-            # 4. 处理结果 - 使用 HuggingFace 模型的标签映射
-            # 构建完整的情绪概率字典
+            # 4. 处理结果 - 构建完整的情绪概率字典
             emotion_probabilities = {}
+            
+            # 获取情绪标签列表
+            if hasattr(self._model, 'label_encoder'):
+                # SpeechBrain模型使用label_encoder
+                emotion_labels = [self._model.label_encoder.ind2lab[i] for i in range(len(probs))]
+            elif hasattr(self._model, 'config') and hasattr(self._model.config, 'id2label'):
+                # HuggingFace模型使用config.id2label
+                emotion_labels = [self._model.config.id2label[i] for i in range(len(probs))]
+            else:
+                # 默认使用数字索引
+                emotion_labels = [f"emotion_{i}" for i in range(len(probs))]
+            
+            # 构建概率字典
             for i, prob in enumerate(probs):
-                if i < len(self._model.config.id2label):
-                    emotion_name = self._model.config.id2label[i]
+                if i < len(emotion_labels):
+                    emotion_name = emotion_labels[i]
                     emotion_probabilities[emotion_name] = float(prob)
             
             # 主要情绪就是 HuggingFace 预测的 emotion_label
