@@ -49,26 +49,18 @@ async def lifespan(app: FastAPI):
     verify_audio_stack()
     
     # 预加载声纹识别模型
-    try:
-        await VoiceprintService.initialize_model()
+    voiceprint_model_loaded = await VoiceprintService.initialize_model()
+    if voiceprint_model_loaded:
         logger.info("Voiceprint model initialized successfully")
-    except ImportError as e:
-        logger.error(f"SpeechBrain not properly installed: {e}")
-        logger.warning("Voiceprint recognition will be unavailable")
-    except Exception as e:
-        logger.error(f"Failed to initialize voiceprint model: {e}")
-        logger.warning("System will continue without voiceprint recognition capability")
+    else:
+        logger.warning("Voiceprint recognition will be unavailable - run download script to get models")
     
     # 预加载情绪识别模型
-    try:
-        await EmotionService.initialize_model()
+    emotion_model_loaded = await EmotionService.initialize_model()
+    if emotion_model_loaded:
         logger.info("Emotion recognition model initialized successfully")
-    except ImportError as e:
-        logger.error(f"SpeechBrain not properly installed: {e}")
-        logger.warning("Emotion recognition will be unavailable")
-    except Exception as e:
-        logger.error(f"Failed to initialize emotion model: {e}")
-        logger.warning("System will continue without emotion recognition capability")
+    else:
+        logger.warning("Emotion recognition will be unavailable - run download script to get models")
     
     # 创建必要的目录
     for directory in [settings.UPLOAD_DIR, settings.TEMP_DIR, "logs"]:
@@ -192,8 +184,8 @@ async def health_check():
             "services": {
                 "database": "healthy",
                 "minio": "healthy",
-                "voiceprint_model": "healthy" if vp_model_status else "initializing",
-                "emotion_model": "healthy" if emo_model_status else "initializing"
+                "voiceprint_model": "healthy" if vp_model_status else "unavailable",
+                "emotion_model": "healthy" if emo_model_status else "unavailable"
             }
         }
     except Exception as e:

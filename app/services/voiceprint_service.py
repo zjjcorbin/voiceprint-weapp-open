@@ -51,9 +51,17 @@ class VoiceprintService:
             
             logger.info(f"Voiceprint model loaded: {settings.VOICEPRINT_MODEL}")
             return True
+        except ImportError as e:
+            logger.error(f"SpeechBrain not properly installed for voiceprint recognition: {e}")
+            logger.warning("Voiceprint recognition will be unavailable")
+            cls._model = None
+            return False
         except Exception as e:
             logger.error(f"Failed to initialize voiceprint model: {e}")
-            raise
+            logger.warning("Voiceprint recognition will be unavailable - run download script to get models")
+            cls._model = None
+            cls._vad = None
+            return False
     
     async def check_model_status(self) -> bool:
         """检查模型状态"""
@@ -62,7 +70,7 @@ class VoiceprintService:
     async def extract_voiceprint(self, audio_data: bytes, employee_id: int) -> VoiceprintFeature:
         """提取声纹特征"""
         if not self._model:
-            raise RuntimeError("Voiceprint model not initialized")
+            raise RuntimeError("声纹识别模型未初始化，请先运行模型下载脚本: python scripts/download_models.py")
         
         try:
             # 1. 音频预处理
