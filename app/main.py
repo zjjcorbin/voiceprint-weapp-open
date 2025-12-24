@@ -351,6 +351,85 @@ async def test_emotion_detection(audio_file: UploadFile = File(...)):
                 "error_code": "INTERNAL_ERROR"
             }
         )
+# 文件上传调试端点
+@app.post("/debug/upload", tags=["调试"])
+async def debug_upload(audio_file: UploadFile = File(...)):
+    """调试文件上传问题"""
+    
+    logger.info(f"=== 文件上传调试信息 ===")
+    logger.info(f"文件名: {audio_file.filename}")
+    logger.info(f"文件类型: {audio_file.content_type}")
+    logger.info(f"文件大小头信息: {audio_file.size if hasattr(audio_file, 'size') else 'N/A'}")
+    
+    # 读取文件数据
+    audio_data = await audio_file.read()
+    logger.info(f"实际读取的数据大小: {len(audio_data)} bytes")
+    
+    # 保存原始文件用于调试
+    import tempfile
+    import os
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix="_original") as temp_file:
+        temp_file.write(audio_data)
+        original_path = temp_file.name
+    
+    logger.info(f"原始文件保存到: {original_path}")
+    
+    # 检查文件内容
+    file_info = {
+        "filename": audio_file.filename,
+        "content_type": audio_file.content_type,
+        "data_size": len(audio_data),
+        "original_path": original_path
+    }
+    
+    # 如果是音频文件，尝试分析
+    if len(audio_data) > 0:
+        try:
+            import wave
+            import io
+            
+            # 尝试作为WAV文件读取
+            wav_buffer = io.BytesIO(audio_data)
+            with wave.open(wav_buffer, 'rb') as wav_file:
+                file_info.update({
+                    "channels": wav_file.getnchannels(),
+                    "sample_width": wav_file.getsampwidth(),
+                    "frame_rate": wav_file.getframerate(),
+                    "frames": wav_file.getnframes(),
+                    "duration": wav_file.getnframes() / wav_file.getframerate()
+                })
+        except Exception as e:
+            file_info["wav_error"] = str(e)
+            
+        # 尝试使用librosa分析
+        try:
+            import librosa
+            import numpy as np
+            
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+                temp_file.write(audio_data)
+                temp_path = temp_file.name
+            
+            y, sr = librosa.load(temp_path, sr=None)
+            file_info.update({
+                "librosa_sr": sr,
+                "librosa_duration": len(y) / sr,
+                "librosa_samples": len(y)
+            })
+            
+            os.unlink(temp_path)
+        except Exception as e:
+            file_info["librosa_error"] = str(e)
+    
+    # 清理临时文件
+    os.unlink(original_path)
+    
+    return {
+        "success": True,
+        "message": "文件上传调试完成",
+        "file_info": file_info
+    }
 
 
 # 注册路由
