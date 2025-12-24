@@ -40,14 +40,36 @@ class VoiceprintService:
     async def initialize_model(cls):
         """初始化声纹识别模型"""
         try:
+            # 设置Hugging Face镜像（如果在中国大陆）
+            if os.getenv("USE_HF_MIRROR", "false").lower() == "true":
+                os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+                logger.info("Using Hugging Face mirror: https://hf-mirror.com")
+            
+            # 尝试导入不同版本的SpeechBrain
+            try:
+                from speechbrain.inference.speaker import SpeakerRecognition
+            except ImportError:
+                try:
+                    from speechbrain.pretrained import SpeakerRecognition
+                except ImportError as e:
+                    logger.error(f"SpeechBrain import failed: {e}")
+                    logger.warning("请安装SpeechBrain: pip install speechbrain")
+                    cls._model = None
+                    return False
+            
             # 使用SpeechBrain的预训练模型
             cls._model = SpeakerRecognition.from_hparams(
                 source=settings.VOICEPRINT_MODEL,
-                savedir="pretrained_models/" + settings.VOICEPRINT_MODEL.split("/")[-1]
+                savedir="pretrained_models/" + settings.VOICEPRINT_MODEL.split("/")[-1],
+                run_opts={"device": "cpu"}  # 初始化时使用CPU避免GPU内存问题
             )
             
             # 初始化VAD
-            cls._vad = webrtcvad.Vad(3)  # 高敏感度
+            try:
+                cls._vad = webrtcvad.Vad(3)  # 高敏感度
+            except ImportError as e:
+                logger.warning(f"VAD module not available: {e}")
+                cls._vad = None
             
             logger.info(f"Voiceprint model loaded: {settings.VOICEPRINT_MODEL}")
             return True

@@ -123,6 +123,11 @@ def verify_audio_stack():
     """验证整个音频处理栈的兼容性"""
     print("验证音频处理栈兼容性...")
     
+    # 设置Hugging Face镜像（如果在中国大陆）
+    if os.getenv("USE_HF_MIRROR", "false").lower() == "true":
+        os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+        print(f"✓ 使用Hugging Face镜像: {os.environ['HF_ENDPOINT']}")
+    
     # 检查torch版本
     import torch
     print(f"✓ PyTorch版本: {torch.__version__}")

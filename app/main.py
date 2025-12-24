@@ -44,6 +44,11 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to initialize MinIO: {e}")
         raise
     
+    # 设置Hugging Face镜像（如果在中国大陆）
+    if os.getenv("USE_HF_MIRROR", "false").lower() == "true":
+        os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+        logger.info("Using Hugging Face mirror: https://hf-mirror.com")
+    
     # 验证音频处理栈兼容性
     from app.utils.audio_compat import verify_audio_stack
     verify_audio_stack()
