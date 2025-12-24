@@ -1,10 +1,24 @@
 import os
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, List
 
 
 class Settings(BaseSettings):
     """应用配置"""
+    
+    from pydantic import field_validator
+    
+    @field_validator('SUPPORTED_EMOTIONS', mode='before')
+    @classmethod
+    def parse_supported_emotions(cls, v):
+        """验证并转换SUPPORTED_EMOTIONS字段值"""
+        if isinstance(v, str):
+            # 如果是字符串，按逗号分割
+            return [emotion.strip() for emotion in v.split(",") if emotion.strip()]
+        elif isinstance(v, list):
+            return v
+        else:
+            raise ValueError("SUPPORTED_EMOTIONS must be a string or list")
     
     # 应用基础配置
     APP_NAME: str = "声纹识别系统"
@@ -35,7 +49,7 @@ class Settings(BaseSettings):
     # 情绪识别配置
     EMOTION_MODEL: str = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
     EMOTION_CONFIDENCE_THRESHOLD: float = 0.6
-    SUPPORTED_EMOTIONS: list = ["neutral", "happy", "sad", "angry", "fear", "disgust", "surprise"]
+    SUPPORTED_EMOTIONS: list[str] = ["neutral", "happy", "sad", "angry", "fear", "disgust", "surprise"]
     EMOTION_ANALYSIS_ENABLED: bool = True
     
     # 微信配置
