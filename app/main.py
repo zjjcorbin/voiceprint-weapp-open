@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -15,7 +15,6 @@ from app.routers import emotion, auth, employee, voiceprint, meeting, speech, up
 from app.core.exceptions import VoiceprintException
 from app.services.voiceprint_service import VoiceprintService
 from app.services.emotion_service import EmotionService
-from app.utils.audio_compat import check_audio_backend
 
 
 @asynccontextmanager
@@ -49,23 +48,30 @@ async def lifespan(app: FastAPI):
         os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
         logger.info("Using Hugging Face mirror: https://hf-mirror.com")
     
-    # 验证音频处理栈兼容性
-    from app.utils.audio_compat import verify_audio_stack
-    verify_audio_stack()
-    
-    # 预加载声纹识别模型
-    voiceprint_model_loaded = await VoiceprintService.initialize_model()
-    if voiceprint_model_loaded:
-        logger.info("Voiceprint model initialized successfully")
+    # 仅在需要时验证音频处理栈兼容性
+    if os.getenv("SKIP_AUDIO_CHECK", "false").lower() != "true":
+        from app.utils.audio_compat import verify_audio_stack
+        verify_audio_stack()
     else:
-        logger.warning("Voiceprint recognition will be unavailable - run download script to get models")
+        logger.info("Audio stack check skipped via environment variable")
     
-    # 预加载情绪识别模型
-    emotion_model_loaded = await EmotionService.initialize_model()
-    if emotion_model_loaded:
-        logger.info("Emotion recognition model initialized successfully")
+    # 仅在需要时预加载模型
+    if os.getenv("PRELOAD_MODELS", "false").lower() == "true":
+        # 预加载声纹识别模型
+        voiceprint_model_loaded = await VoiceprintService.initialize_model()
+        if voiceprint_model_loaded:
+            logger.info("Voiceprint model initialized successfully")
+        else:
+            logger.warning("Voiceprint recognition will be unavailable - run download script to get models")
+        
+        # 预加载情绪识别模型
+        emotion_model_loaded = await EmotionService.initialize_model()
+        if emotion_model_loaded:
+            logger.info("Emotion recognition model initialized successfully")
+        else:
+            logger.warning("Emotion recognition will be unavailable - run download script to get models")
     else:
-        logger.warning("Emotion recognition will be unavailable - run download script to get models")
+        logger.info("Model preloading disabled - models will be loaded on-demand")
     
     # 创建必要的目录
     for directory in [settings.UPLOAD_DIR, settings.TEMP_DIR, "logs"]:
@@ -174,24 +180,36 @@ async def health_check():
         # 检查MinIO连接
         minio_client.list_buckets()
         
-        # 检查声纹模型
-        voiceprint_service = VoiceprintService()
-        vp_model_status = await voiceprint_service.check_model_status()
+        # 仅在需要时检查模型状态
+        services = {
+            "database": "healthy",
+            "minio": "healthy"
+        }
         
-        # 检查情绪识别模型
-        emotion_service = EmotionService()
-        emo_model_status = await emotion_service.check_model_status()
+        if os.getenv("CHECK_MODELS_IN_HEALTH", "true").lower() == "true":
+            # 检查声纹模型
+            voiceprint_service = VoiceprintService()
+            vp_model_status = await voiceprint_service.check_model_status()
+            
+            # 检查情绪识别模型
+            emotion_service = EmotionService()
+            emo_model_status = await emotion_service.check_model_status()
+            
+            services.update({
+                "voiceprint_model": "healthy" if vp_model_status else "unavailable",
+                "emotion_model": "healthy" if emo_model_status else "unavailable"
+            })
+        else:
+            services.update({
+                "voiceprint_model": "check_disabled",
+                "emotion_model": "check_disabled"
+            })
         
         return {
             "status": "healthy",
             "timestamp": time.time(),
             "version": settings.APP_VERSION,
-            "services": {
-                "database": "healthy",
-                "minio": "healthy",
-                "voiceprint_model": "healthy" if vp_model_status else "unavailable",
-                "emotion_model": "healthy" if emo_model_status else "unavailable"
-            }
+            "services": services
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -215,6 +233,100 @@ async def root():
         "docs_url": "/docs" if settings.DEBUG else None,
         "status": "running"
     }
+
+
+# 情绪识别测试端点
+@app.post("/test/emotion", tags=["测试"])
+async def test_emotion_detection(audio_file: UploadFile = File(...)):
+    """测试情绪识别功能 - 无需认证的简单测试接口"""
+    from app.services.emotion_service import EmotionService
+    import time
+    
+    try:
+        # 检查模型状态
+        emotion_service = EmotionService()
+        if not await emotion_service.check_model_status():
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "success": False,
+                    "message": "情绪识别服务未就绪",
+                    "error_code": "SERVICE_UNAVAILABLE"
+                }
+            )
+        
+        # 验证文件类型
+        if not audio_file.content_type.startswith('audio/'):
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "success": False,
+                    "message": "请上传音频文件",
+                    "error_code": "INVALID_FILE_TYPE"
+                }
+            )
+        
+        # 读取音频数据
+        audio_data = await audio_file.read()
+        
+        if len(audio_data) == 0:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "success": False,
+                    "message": "音频文件为空",
+                    "error_code": "EMPTY_FILE"
+                }
+            )
+        
+        # 检查文件大小（最大50MB）
+        if len(audio_data) > 50 * 1024 * 1024:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "success": False,
+                    "message": "音频文件过大，请上传小于50MB的文件",
+                    "error_code": "FILE_TOO_LARGE"
+                }
+            )
+        
+        start_time = time.time()
+        
+        # 进行情绪检测
+        emotion_result = await emotion_service.detect_emotion(
+            audio_data=audio_data,
+            employee_id=None
+        )
+        
+        processing_time = time.time() - start_time
+        
+        return {
+            "success": True,
+            "message": "情绪检测完成",
+            "filename": audio_file.filename,
+            "processing_time": round(processing_time, 3),
+            "result": {
+                "dominant_emotion": emotion_result.dominant_emotion,
+                "confidence": emotion_result.confidence,
+                "intensity": emotion_result.intensity,
+                "complexity": emotion_result.complexity,
+                "quality_score": emotion_result.quality_score,
+                "audio_duration": emotion_result.audio_duration,
+                "emotion_probabilities": emotion_result.emotion_probabilities,
+                "analysis": emotion_result.analysis
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Test emotion detection failed: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": f"情绪检测失败: {str(e)}",
+                "error_code": "INTERNAL_ERROR"
+            }
+        )
 
 
 # 注册路由
