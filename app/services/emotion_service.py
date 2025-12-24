@@ -154,7 +154,7 @@ class EmotionService:
                 analysis=emotion_analysis,
                 audio_url=audio_url,
                 audio_duration=len(audio_tensor) / sr,
-                model_name=settings.EMOTION_MODEL
+                model_name=settings.EMOTION_MODEL,
                 processing_time=0  # 实际应该计算处理时间
             )
             

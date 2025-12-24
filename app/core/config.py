@@ -1,25 +1,21 @@
 import os
+from typing import Optional, List
+
+# 简化导入，避免复杂错误处理
 try:
     from pydantic_settings import BaseSettings
 except ImportError:
-    try:
-        from pydantic import BaseSettings
-    except ImportError as e:
-        raise ImportError("需要安装 pydantic-settings: pip install pydantic-settings") from e
+    print("警告: 未安装 pydantic-settings，使用基础配置类")
+    BaseSettings = object
 
-from typing import Optional, List
-
+# 定义属性装饰器（如果不支持则跳过）
 try:
     from pydantic import field_validator
 except ImportError:
-    try:
-        from pydantic import validator as field_validator
-    except ImportError:
-        # 如果都没有，定义一个空的装饰器
-        def field_validator(field_name, mode='before'):
-            def decorator(func):
-                return func
-            return decorator
+    def field_validator(field_name, mode='before'):
+        def decorator(func):
+            return func
+        return decorator
 
 
 class Settings(BaseSettings):
