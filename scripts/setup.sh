@@ -161,7 +161,7 @@ build_docker() {
     export DOCKER_BUILDKIT=1
     
     # 构建应用镜像，这会在构建过程中下载模型
-    docker-compose build --no-cache app
+    docker-compose build --no-cache voiceprint-api
     
     log_info "Docker镜像构建完成（包含预训练模型）"
 }
