@@ -7,6 +7,7 @@ import uuid
 from app.models.database import get_db
 from app.models.employee import EmployeeModel
 from app.models.voiceprint import VoiceprintModel
+from app.models.user import UserModel
 from app.schemas.voiceprint import (
     VoiceprintRegisterRequest, VoiceprintRegisterResponse,
     VoiceprintRecognizeRequest, VoiceprintRecognizeResponse,
@@ -14,7 +15,7 @@ from app.schemas.voiceprint import (
 )
 from app.services.voiceprint_service import voiceprint_service
 from app.core.security import get_current_user
-from app.schemas.user import UserResponse
+
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ async def register_voiceprint(
     employee_id: int,
     sample_index: int = 1,
     audio_file: UploadFile = File(...),
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -91,7 +92,7 @@ async def recognize_voiceprint(
     background_tasks: BackgroundTasks,
     meeting_id: Optional[int] = None,
     audio_file: UploadFile = File(...),
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -162,7 +163,7 @@ async def recognize_voiceprint(
 @router.get("/status/{employee_id}", response_model=VoiceprintStatusResponse)
 async def get_voiceprint_status(
     employee_id: int,
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """获取员工声纹注册状态"""
@@ -210,7 +211,7 @@ async def get_voiceprint_status(
 @router.delete("/{voiceprint_id}", response_model=VoiceprintDeleteResponse)
 async def delete_voiceprint(
     voiceprint_id: str,
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """删除声纹样本"""
@@ -267,7 +268,7 @@ async def list_voiceprints(
     employee_id: Optional[int] = None,
     page: int = 1,
     size: int = 20,
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """获取声纹列表"""
