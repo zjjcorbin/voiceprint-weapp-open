@@ -84,6 +84,8 @@ class VoiceprintStats(BaseModel):
 
 class VoiceprintQualityAnalysis(BaseModel):
     """声纹质量分析"""
+    model_config = {'protected_namespaces': ()}
+    
     voiceprint_id: str = Field(..., description="声纹ID")
     duration: float = Field(..., description="音频时长")
     signal_to_noise_ratio: float = Field(..., description="信噪比(dB)")

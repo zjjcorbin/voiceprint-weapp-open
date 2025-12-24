@@ -128,6 +128,8 @@ class EmotionAlert(BaseModel):
 
 class EmotionStatistics(BaseModel):
     """情绪统计"""
+    model_config = {'protected_namespaces': ()}
+    
     total_detections: int = Field(..., description="总检测次数")
     successful_detections: int = Field(..., description="成功检测次数")
     average_confidence: float = Field(..., ge=0.0, le=1.0, description="平均置信度")
