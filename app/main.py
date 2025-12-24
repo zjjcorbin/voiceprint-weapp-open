@@ -255,16 +255,33 @@ async def test_emotion_detection(audio_file: UploadFile = File(...)):
                 }
             )
         
-        # 验证文件类型
-        if not audio_file.content_type.startswith('audio/'):
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "success": False,
-                    "message": "请上传音频文件",
-                    "error_code": "INVALID_FILE_TYPE"
-                }
-            )
+        # 验证文件类型（支持content_type为None的情况）
+        supported_audio_types = ['audio/wav', 'audio/mp3', 'audio/m4a', 'audio/ogg', 'audio/x-wav']
+        
+        if audio_file.content_type:
+            # 检查标准MIME类型
+            if not any(audio_file.content_type.startswith(audio_type) for audio_type in ['audio/', 'video/']):
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "success": False,
+                        "message": f"不支持的文件类型: {audio_file.content_type}",
+                        "error_code": "INVALID_FILE_TYPE"
+                    }
+                )
+        else:
+            # 如果content_type为None，检查文件扩展名
+            filename = audio_file.filename or ""
+            valid_extensions = ['.wav', '.mp3', '.m4a', '.ogg', '.flac', '.aac']
+            if not any(filename.lower().endswith(ext) for ext in valid_extensions):
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "success": False,
+                        "message": f"不支持的文件格式，请上传音频文件",
+                        "error_code": "INVALID_FILE_TYPE"
+                    }
+                )
         
         # 读取音频数据
         audio_data = await audio_file.read()
