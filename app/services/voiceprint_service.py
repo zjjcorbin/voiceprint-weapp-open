@@ -57,11 +57,15 @@ class VoiceprintService:
                     cls._model = None
                     return False
             
-            # 使用SpeechBrain的预训练模型
+            # 使用绝对路径，避免相对路径在不同工作目录下找不到模型
+            base_dir = "/app/pretrained_models"
+            model_dir = os.path.join(base_dir, settings.VOICEPRINT_MODEL.split("/")[-1])
+            # 使用本地文件，不重新下载
             cls._model = SpeakerRecognition.from_hparams(
                 source=settings.VOICEPRINT_MODEL,
-                savedir="pretrained_models/" + settings.VOICEPRINT_MODEL.split("/")[-1],
-                run_opts={"device": "cpu"}  # 初始化时使用CPU避免GPU内存问题
+                savedir=model_dir,
+                run_opts={"device": "cpu"},  # 初始化时使用CPU避免GPU内存问题
+                local_files_only=True
             )
             
             # 初始化VAD

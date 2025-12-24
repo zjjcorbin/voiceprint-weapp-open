@@ -65,7 +65,9 @@ class EmotionService:
             
             # 使用配置文件中的情绪识别模型
             model_name = settings.EMOTION_MODEL
-            save_dir = f"pretrained_models/emotion_recognition_{model_name.split('/')[-1]}"
+            # 使用绝对路径，避免相对路径在不同工作目录下找不到模型
+            base_dir = "/app/pretrained_models"
+            save_dir = os.path.join(base_dir, "emotion_recognition_" + model_name.split("/")[-1])
             
             # 尝试导入不同版本的SpeechBrain
             try:
@@ -79,10 +81,12 @@ class EmotionService:
                     cls._model = None
                     return False
             
+            # 使用本地文件，不重新下载
             cls._model = EncoderClassifier.from_hparams(
                 source=model_name,
                 savedir=save_dir,
-                run_opts={"device": str(cls._device)}
+                run_opts={"device": str(cls._device)},
+                local_files_only=True
             )
             
             logger.info(f"Emotion recognition model loaded: {model_name}")
