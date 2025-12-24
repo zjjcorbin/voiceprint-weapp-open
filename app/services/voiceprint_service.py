@@ -61,11 +61,19 @@ class VoiceprintService:
             base_dir = "/app/pretrained_models"
             model_dir = os.path.join(base_dir, settings.VOICEPRINT_MODEL.split("/")[-1])
             # 使用本地文件，不重新下载
+            # 检查模型文件是否已存在，避免意外下载
+            required_files = ["hyperparams.yaml"]
+            missing_files = [f for f in required_files if not os.path.exists(os.path.join(model_dir, f))]
+            if missing_files:
+                logger.error(f"Model files missing in {model_dir}: {missing_files}")
+                logger.warning("Please run the download script first: python scripts/download_models.py")
+                cls._model = None
+                return False
+
             cls._model = SpeakerRecognition.from_hparams(
                 source=settings.VOICEPRINT_MODEL,
                 savedir=model_dir,
-                run_opts={"device": "cpu"},  # 初始化时使用CPU避免GPU内存问题
-                local_files_only=True
+                run_opts={"device": "cpu"}  # 初始化时使用CPU避免GPU内存问题
             )
             
             # 初始化VAD

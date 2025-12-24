@@ -81,12 +81,19 @@ class EmotionService:
                     cls._model = None
                     return False
             
-            # 使用本地文件，不重新下载
+            # 检查模型文件是否已存在，避免意外下载
+            required_files = ["hyperparams.yaml"]
+            missing_files = [f for f in required_files if not os.path.exists(os.path.join(save_dir, f))]
+            if missing_files:
+                logger.error(f"Model files missing in {save_dir}: {missing_files}")
+                logger.warning("Please run the download script first: python scripts/download_models.py")
+                cls._model = None
+                return False
+
             cls._model = EncoderClassifier.from_hparams(
                 source=model_name,
                 savedir=save_dir,
-                run_opts={"device": str(cls._device)},
-                local_files_only=True
+                run_opts={"device": str(cls._device)}
             )
             
             logger.info(f"Emotion recognition model loaded: {model_name}")
