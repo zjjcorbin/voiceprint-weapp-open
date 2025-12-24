@@ -174,22 +174,22 @@ class EmotionService:
                         if not os.path.exists(temp_file.name) or os.path.getsize(temp_file.name) == 0:
                             raise RuntimeError("临时WAV文件创建失败")
                         
-                        # 进行情绪预测 - 改进版本（SpeechBrain 1.0.3 兼容）
+                        # 进行情绪预测 - 使用 HuggingFace 原生方式
                         try:
-                        # 使用 HuggingFace 原生方式进行推理
-                        audio_np = audio_tensor.cpu().numpy()
-                        
-                        # 确保音频数据在合理范围内
-                        if np.max(np.abs(audio_np)) > 0:
-                            audio_np = audio_np / np.max(np.abs(audio_np))
-                        
-                        # 使用 feature_extractor 预处理音频
-                        inputs = self._feature_extractor(
-                            audio_np, 
-                            sampling_rate=sr, 
-                            return_tensors="pt", 
-                            padding=True
-                        )
+                            # 使用 HuggingFace 原生方式进行推理
+                            audio_np = audio_tensor.cpu().numpy()
+                            
+                            # 确保音频数据在合理范围内
+                            if np.max(np.abs(audio_np)) > 0:
+                                audio_np = audio_np / np.max(np.abs(audio_np))
+                            
+                            # 使用 feature_extractor 预处理音频
+                            inputs = self._feature_extractor(
+                                audio_np, 
+                                sampling_rate=sr, 
+                                return_tensors="pt", 
+                                padding=True
+                            )
                         # 移动输入到正确设备
                         inputs = {k: v.to(self._device) for k, v in inputs.items()}
                         
