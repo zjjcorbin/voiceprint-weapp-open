@@ -17,7 +17,7 @@ def download_models():
         
         # 创建模型目录
         os.makedirs("pretrained_models/spkrec-ecapa-voxceleb", exist_ok=True)
-        os.makedirs("pretrained_models/emotion-recognition-ecapa", exist_ok=True)
+        os.makedirs("pretrained_models/emotion_recognition_wav2vec2", exist_ok=True)
         
         print("下载声纹识别模型...")
         spk_model = SpeakerRecognition.from_hparams(
@@ -27,32 +27,24 @@ def download_models():
         print("声纹识别模型下载完成")
         
         print("下载情绪识别模型...")
-        # 尝试多个可用的情绪识别模型
-        emotion_models = [
-            "speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
-            "speechbrain/emotion-identification-IEMOCAP",
-            "speechbrain/emotion-raw-wav2vec2-IEMOCAP"
-        ]
+        # 只下载指定的情绪识别模型
+        emotion_model = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
         
-        emotion_model_loaded = False
-        for model_name in emotion_models:
-            try:
-                emo_model = EncoderClassifier.from_hparams(
-                    source=model_name,
-                    savedir=f"pretrained_models/{model_name.split('/')[-1]}"
-                )
-                print(f"情绪识别模型 {model_name} 下载完成")
-                emotion_model_loaded = True
-                break
-            except Exception as e:
-                print(f"模型 {model_name} 下载失败: {str(e)[:100]}")
-                continue
+        try:
+            emo_model = EncoderClassifier.from_hparams(
+                source=emotion_model,
+                savedir="pretrained_models/emotion_recognition_wav2vec2"
+            )
+            print(f"情绪识别模型 {emotion_model} 下载完成")
+        except Exception as e:
+            print(f"情绪识别模型下载失败: {e}")
+            print("系统将在首次运行时自动尝试下载模型")
+            return False
         
-        if not emotion_model_loaded:
-            print("警告：所有情绪识别模型都下载失败，系统将跳过情绪识别功能")
-            print("建议：系统将在首次运行时自动尝试下载模型")
-        
-        print("所有模型下载完成！")
+        print("模型下载完成！")
+        print("已下载模型:")
+        print("  - 声纹识别: speechbrain/spkrec-ecapa-voxceleb")
+        print("  - 情绪识别: speechbrain/emotion-recognition-wav2vec2-IEMOCAP")
         return True
         
     except ImportError as e:

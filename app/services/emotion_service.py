@@ -52,45 +52,26 @@ class EmotionService:
     
     @classmethod
     async def initialize_model(cls):
-        """初始化情绪识别模型"""
+        """初始化情绪识别模型 - 只使用emotion-recognition-wav2vec2-IEMOCAP"""
         try:
             # 检测设备
             cls._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             logger.info(f"Using device: {cls._device}")
             
-            # 使用SpeechBrain的情绪识别模型
-            # 使用ECAPA模型，更稳定可靠
+            # 固定使用emotion-recognition-wav2vec2-IEMOCAP模型
+            model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
             cls._model = EncoderClassifier.from_hparams(
-                source=settings.EMOTION_MODEL,
-                savedir="pretrained_models/emotion_recognition",
+                source=model_name,
+                savedir="pretrained_models/emotion_recognition_wav2vec2",
                 run_opts={"device": str(cls._device)}
             )
             
-            logger.info("Emotion recognition model loaded successfully")
+            logger.info(f"Emotion recognition model loaded: {model_name}")
             return True
             
         except Exception as e:
-            logger.error(f"Failed to initialize emotion model: {e}")
-            # 备用方案：尝试不同的模型
-            backup_models = [
-                "speechbrain/emotion-identification-IEMOCAP",
-                "speechbrain/emotion-raw-wav2vec2-IEMOCAP",
-                "speechbrain/emotion-recognition-cnn14-esc50"
-            ]
-            
-            for backup_model in backup_models:
-                try:
-                    cls._model = EncoderClassifier.from_hparams(
-                        source=backup_model,
-                        savedir=f"pretrained_models/emotion_backup_{backup_model.split('/')[-1]}",
-                        run_opts={"device": str(cls._device)}
-                    )
-                    logger.info(f"Backup emotion recognition model loaded: {backup_model}")
-                    return True
-                except Exception as backup_e:
-                    logger.warning(f"Failed to load backup model {backup_model}: {backup_e}")
-            
-            raise Exception("All emotion recognition models failed to load")
+            logger.error(f"Failed to initialize emotion model {model_name}: {e}")
+            raise RuntimeError(f"Failed to load emotion model: {model_name}")
     
     async def check_model_status(self) -> bool:
         """检查模型状态"""
@@ -171,7 +152,7 @@ class EmotionService:
                 analysis=emotion_analysis,
                 audio_url=audio_url,
                 audio_duration=len(audio_tensor) / sr,
-                model_name="speechbrain/emotion-recognition-wav2vec2-IEMOCAP",
+                model_name="speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
                 processing_time=0  # 实际应该计算处理时间
             )
             

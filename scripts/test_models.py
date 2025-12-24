@@ -55,48 +55,40 @@ def test_speaker_recognition():
         return False
 
 def test_emotion_recognition():
-    """测试情绪识别模型"""
+    """测试情绪识别模型 - 只测试emotion-recognition-wav2vec2-IEMOCAP"""
     print("测试情绪识别模型...")
     
-    # 测试多个模型
-    models_to_test = [
-        ("speechbrain/emotion-recognition-wav2vec2-IEMOCAP", "emotion_recognition_wav2vec2"),
-        ("speechbrain/emotion-identification-IEMOCAP", "emotion_identification_iemocap"),
-        ("speechbrain/emotion-raw-wav2vec2-IEMOCAP", "emotion_raw_wav2vec2"),
-        ("speechbrain/emotion-recognition-cnn14-esc50", "emotion_recognition_cnn14")
-    ]
+    # 只测试指定的模型
+    model_name = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+    save_dir = "emotion_recognition_wav2vec2"
     
-    for model_name, save_dir in models_to_test:
-        print(f"  测试模型: {model_name}")
+    print(f"  测试模型: {model_name}")
+    try:
         try:
-            try:
-                from speechbrain.inference.classifiers import EncoderClassifier
-            except ImportError:
-                from speechbrain.pretrained import EncoderClassifier
+            from speechbrain.inference.classifiers import EncoderClassifier
+        except ImportError:
+            from speechbrain.pretrained import EncoderClassifier
+        
+        # 加载模型
+        model = EncoderClassifier.from_hparams(
+            source=model_name,
+            savedir=f"pretrained_models/{save_dir}"
+        )
+        
+        # 创建测试音频
+        audio, sr = create_test_audio()
+        
+        # 情绪识别
+        with torch.no_grad():
+            prediction = model.classify_batch(torch.tensor(audio).unsqueeze(0))
             
-            # 加载模型
-            model = EncoderClassifier.from_hparams(
-                source=model_name,
-                savedir=f"pretrained_models/{save_dir}"
-            )
-            
-            # 创建测试音频
-            audio, sr = create_test_audio()
-            
-            # 情绪识别
-            with torch.no_grad():
-                prediction = model.classify_batch(torch.tensor(audio).unsqueeze(0))
-                
-            print(f"  ✓ 情绪识别模型 {model_name} 加载成功")
-            print(f"    预测结果: {prediction}")
-            return True
-            
-        except Exception as e:
-            print(f"  ✗ 模型 {model_name} 测试失败: {e}")
-            continue
-    
-    print("✗ 所有情绪识别模型都测试失败")
-    return False
+        print(f"  ✓ 情绪识别模型 {model_name} 加载成功")
+        print(f"    预测结果: {prediction}")
+        return True
+        
+    except Exception as e:
+        print(f"  ✗ 模型 {model_name} 测试失败: {e}")
+        return False
 
 def test_audio_processing():
     """测试音频处理功能"""

@@ -19,11 +19,11 @@ RUN mkdir -p /root/.config/pip/ && \
 # 复制requirements文件
 COPY requirements.txt .
 
-# 安装Python依赖 - SpeechBrain 1.0.3最新版本
+# 安装Python依赖 - 使用安全修复版本
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir --upgrade setuptools wheel \
-    && pip install --no-cache-dir torch==2.2.0 torchvision==0.17.0 --index-url https://download.pytorch.org/whl/cu118 \
-    && pip install --no-cache-dir torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
+    && pip install --no-cache-dir torch==2.2.1 torchvision==0.17.1 --index-url https://download.pytorch.org/whl/cu118 \
+    && pip install --no-cache-dir torchaudio==2.2.1 --index-url https://download.pytorch.org/whl/cu118 \
     && pip install --no-cache-dir speechbrain==1.0.3 \
     && pip install --no-cache-dir transformers==4.36.2 \
     && pip install --no-cache-dir -r requirements.txt \

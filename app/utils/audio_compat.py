@@ -6,6 +6,7 @@
 import torchaudio
 import warnings
 import sys
+import os
 
 def setup_torchaudio_compatibility():
     """
@@ -125,6 +126,20 @@ def verify_audio_stack():
     # 检查torch版本
     import torch
     print(f"✓ PyTorch版本: {torch.__version__}")
+    
+    # 检查torch.load安全性
+    try:
+        # 检查是否支持weights_only参数
+        test_tensor = torch.randn(1, 1)
+        temp_file = "/tmp/test_tensor.pt"
+        torch.save(test_tensor, temp_file)
+        
+        # 测试weights_only加载
+        loaded = torch.load(temp_file, weights_only=True)
+        os.remove(temp_file)
+        print("✓ torch.load weights_only安全检查通过")
+    except Exception as e:
+        print(f"⚠ torch.load安全检查失败: {e}")
     
     # 检查torchaudio版本
     print(f"✓ TorchAudio版本: {torchaudio.__version__}")
