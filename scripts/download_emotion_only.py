@@ -6,20 +6,61 @@
 import os
 import sys
 
+def check_model_exists(save_dir):
+    """检查模型文件是否已存在"""
+    model_path = f"pretrained_models/{save_dir}"
+    
+    if not os.path.exists(model_path):
+        return False
+    
+    # 检查关键文件是否存在
+    key_files = [
+        "hyperparams.yaml",
+        "custom.yaml", 
+        "tok.emb",
+        "embedding_model.ckpt"
+    ]
+    
+    for file_name in key_files:
+        file_path = os.path.join(model_path, file_name)
+        if not os.path.exists(file_path):
+            print(f"缺少关键文件: {file_path}")
+            return False
+    
+    return True
+
 def download_emotion_model_only():
     """下载配置文件中指定的情绪识别模型"""
-    print("开始下载情绪识别模型...")
-    print("=" * 50)
-    
     # 添加项目根目录到Python路径
     import os
     import sys
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
+    # 设置Hugging Face镜像
+    os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+    
     from app.core.config import settings
     
     model_name = settings.EMOTION_MODEL
     save_dir = f"emotion_recognition_{model_name.split('/')[-1]}"
+    model_path = f"pretrained_models/{save_dir}"
+    
+    print("情绪识别模型下载脚本")
+    print("=" * 50)
+    print(f"模型: {model_name}")
+    print(f"保存目录: {model_path}")
+    print("使用国内镜像: https://hf-mirror.com")
+    print("=" * 50)
+    
+    # 检查模型是否已存在
+    if check_model_exists(save_dir):
+        print("检测到模型文件已存在，跳过下载")
+        print("如需重新下载，请删除以下目录:")
+        print(f"  {model_path}")
+        print("=" * 50)
+        return True
+    
+    print("开始下载情绪识别模型...")
     
     try:
         # 导入SpeechBrain
@@ -29,24 +70,31 @@ def download_emotion_model_only():
             from speechbrain.pretrained import EncoderClassifier
         
         # 创建模型目录
-        os.makedirs(f"pretrained_models/{save_dir}", exist_ok=True)
+        os.makedirs(model_path, exist_ok=True)
         
-        print(f"正在下载模型: {model_name}")
-        print(f"保存目录: pretrained_models/{save_dir}")
+        print("正在从Hugging Face镜像下载模型...")
+        print("这可能需要几分钟时间，请耐心等待...")
         
         # 下载模型
         model = EncoderClassifier.from_hparams(
             source=model_name,
-            savedir=f"pretrained_models/{save_dir}"
+            savedir=model_path,
+            run_opts={"device": "cpu"}  # 下载时使用CPU避免GPU内存问题
         )
         
         print("=" * 50)
-        print("✓ 情绪识别模型下载成功！")
+        print("[OK] 情绪识别模型下载成功！")
         print(f"模型: {model_name}")
-        print(f"目录: pretrained_models/{save_dir}")
+        print(f"目录: {model_path}")
         print(f"配置文件: {settings.EMOTION_MODEL}")
-        print("=" * 50)
         
+        # 验证下载
+        if check_model_exists(save_dir):
+            print("[OK] 模型文件验证通过")
+        else:
+            print("[WARN] 模型文件验证失败，但下载可能已完成")
+        
+        print("=" * 50)
         return True
         
     except ImportError as e:

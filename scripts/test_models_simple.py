@@ -22,9 +22,22 @@ def test_imports():
         
         # 测试SpeechBrain导入
         try:
-            from speechbrain.inference.classifiers import EncoderClassifier
-            from speechbrain.inference.speaker import SpeakerRecognition
-            print("[OK] SpeechBrain模块导入成功")
+            import speechbrain
+            print(f"[OK] SpeechBrain导入成功 - 版本: {getattr(speechbrain, '__version__', 'unknown')}")
+            
+            # 尝试不同的导入路径
+            try:
+                from speechbrain.inference.classifiers import EncoderClassifier
+                from speechbrain.inference.speaker import SpeakerRecognition
+                print("[OK] 新版SpeechBrain模块导入成功")
+            except ImportError:
+                try:
+                    from speechbrain.pretrained import EncoderClassifier
+                    from speechbrain.pretrained import SpeakerRecognition
+                    print("[OK] 旧版SpeechBrain模块导入成功")
+                except ImportError as e:
+                    print(f"[FAIL] SpeechBrain子模块导入失败: {e}")
+                    return False
         except ImportError as e:
             print(f"[FAIL] SpeechBrain模块导入失败: {e}")
             print("  请运行: pip install speechbrain")
