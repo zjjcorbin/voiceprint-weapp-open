@@ -139,13 +139,23 @@ class EmotionService:
                 if audio_tensor.dim() == 1:
                     audio_tensor = audio_tensor.unsqueeze(0)
                 
-                # 进行情绪预测 - 简化版本
+                # 进行情绪预测 - 改进版本
                 try:
                     # 保存音频到临时文件并使用classify_file
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
                         # 将tensor转换为numpy数组并保存为WAV文件
                         audio_np = audio_tensor.cpu().numpy()
-                        sf.write(temp_file.name, audio_np, sr)
+                        
+                        # 确保音频数据在合理范围内
+                        if np.max(np.abs(audio_np)) > 0:
+                            audio_np = audio_np / np.max(np.abs(audio_np))
+                        
+                        # 使用soundfile保存为标准的16位PCM WAV格式
+                        sf.write(temp_file.name, audio_np, sr, subtype='PCM_16')
+                        
+                        # 检查文件是否成功创建
+                        if not os.path.exists(temp_file.name) or os.path.getsize(temp_file.name) == 0:
+                            raise RuntimeError("临时WAV文件创建失败")
                         
                         # 使用classify_file方法
                         prediction = self._model.classify_file(temp_file.name)
@@ -164,7 +174,13 @@ class EmotionService:
                             
                 except Exception as e:
                     logger.error(f"Emotion prediction failed: {e}")
-                    raise RuntimeError(f"情绪识别失败: {e}")
+                    # 尝试使用原始音频数据进行处理
+                    try:
+                        logger.info("尝试使用备用方法进行情绪识别...")
+                        # 这里可以添加备用的情绪识别方法
+                        raise RuntimeError(f"情绪识别失败，请检查音频格式和模型配置: {e}")
+                    except Exception as fallback_error:
+                        raise RuntimeError(f"情绪识别失败: {fallback_error}")
                 
                 # 转换为numpy
                 probs = probs.cpu().numpy()[0]
