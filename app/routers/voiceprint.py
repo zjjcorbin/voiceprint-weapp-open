@@ -13,7 +13,7 @@ from app.schemas.voiceprint import (
     VoiceprintStatusResponse, VoiceprintDeleteResponse
 )
 from app.services.voiceprint_service import voiceprint_service
-from app.services.auth_service import get_current_user
+from app.core.security import get_current_user
 from app.schemas.user import UserResponse
 
 router = APIRouter()
