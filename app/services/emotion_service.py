@@ -174,20 +174,26 @@ class EmotionService:
                         if not os.path.exists(temp_file.name) or os.path.getsize(temp_file.name) == 0:
                             raise RuntimeError("临时WAV文件创建失败")
                         
-                        # 使用classify_file方法
-                        prediction = self._model.classify_file(temp_file.name)
-                        
-                        # 清理临时文件
-                        os.unlink(temp_file.name)
-                        
-                        # 提取概率 - SpeechBrain通常返回包含probs的对象
-                        if hasattr(prediction, 'probs'):
-                            probs = prediction.probs.squeeze().cpu().numpy()
-                        elif hasattr(prediction, 'logits'):
-                            probs = torch.softmax(prediction.logits.squeeze(), dim=-1).cpu().numpy()
-                        else:
-                            # 如果以上都不行，尝试直接访问
-                            probs = prediction.squeeze().cpu().numpy() if hasattr(prediction, 'squeeze') else np.array(prediction)
+                        # 进行情绪预测 - 改进版本（SpeechBrain 1.0.3 兼容）
+                        try:
+                            # 使用 encode_batch 进行推理
+                            signal = self._model.load_audio(temp_file.name)
+                            # 添加批次维度
+                            if signal.dim() == 1:
+                                signal = signal.unsqueeze(0)
+                            # 编码特征
+                            predictions = self._model.encode_batch(signal)
+                            # 分类
+                            out_prob = self._model.mods.classifier(predictions)
+                            score, index = torch.max(out_prob, dim=-1)
+                            emotion_label = self._model.hparams.label_encoder.decode_torch(index)[0]
+                            confidence = score.item()
+                            
+                            # 构建概率数组（所有类别的概率）
+                            probs = out_prob.squeeze().cpu().numpy()
+                        except Exception as e:
+                            logger.error(f"Emotion prediction failed: {e}")
+                            raise RuntimeError(f"Emotion prediction failed: {e}")
                             
                 except Exception as e:
                     logger.error(f"Emotion prediction failed: {e}")
